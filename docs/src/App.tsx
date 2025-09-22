@@ -15,6 +15,18 @@ import { AtomsSection } from "./sections/Atoms";
 import { MoleculesSection } from "./sections/Molecules";
 import { OrganismsSection } from "./sections/Organisms";
 
+const withAlpha = (hex: string, alpha: number): string => {
+  const normalized = hex.replace("#", "");
+  if (normalized.length !== 6) {
+    return hex;
+  }
+  const red = parseInt(normalized.slice(0, 2), 16);
+  const green = parseInt(normalized.slice(2, 4), 16);
+  const blue = parseInt(normalized.slice(4, 6), 16);
+  const clamped = Math.min(1, Math.max(0, alpha));
+  return `rgba(${red}, ${green}, ${blue}, ${clamped})`;
+};
+
 const GlobalStyles = createGlobalStyle`
   :root {
     color-scheme: ${({ theme }) => theme.appearance};
@@ -26,8 +38,16 @@ const GlobalStyles = createGlobalStyle`
     margin: 0;
     font-family: ${({ theme }) => theme.typography.fonts.sans};
     background-color: ${({ theme }) => theme.colors.surface.background};
+    background-image: ${({ theme }) =>
+      [
+        `radial-gradient(140% 120% at 0% 0%, ${withAlpha(theme.colors.action.accent.subtle, 0.55)} 0%, transparent 70%)`,
+        `radial-gradient(120% 120% at 100% 0%, ${withAlpha(theme.colors.action.accent.solid, 0.32)} 0%, transparent 65%)`,
+      ].join(", ")};
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: ${({ theme }) => theme.colors.text.primary};
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
   a {
     color: inherit;
@@ -40,6 +60,18 @@ const NAVIGATION_LINKS = [
   { id: "organisms", label: "Organisms" },
 ] as const;
 
+const Navigation = styled.nav`
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: ${({ theme }) => theme.space["2"]};
+  padding: ${({ theme }) => `${theme.space["2"]} ${theme.space["2"]}`};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border: 1px solid ${({ theme }) => theme.colors.border.subtle};
+  background-color: ${({ theme }) => theme.colors.surface.surfaceRaised};
+  box-shadow: ${({ theme }) => theme.shadows.xs};
+`;
+
 const NavigationLink = styled.a`
   text-decoration: none;
   display: inline-flex;
@@ -47,18 +79,24 @@ const NavigationLink = styled.a`
   justify-content: center;
   padding: ${({ theme }) => `${theme.space["2"]} ${theme.space["3"]}`};
   border-radius: ${({ theme }) => theme.radii.md};
-  background-color: ${({ theme }) => theme.colors.surface.surfaceSunken};
-  color: ${({ theme }) => theme.colors.action.accent.solid};
+  color: ${({ theme }) => theme.colors.text.secondary};
   font-size: ${({ theme }) => theme.typography.variants.detail.fontSize};
   line-height: ${({ theme }) => theme.typography.variants.detail.lineHeight};
   letter-spacing: ${({ theme }) => theme.typography.variants.detail.letterSpacing};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  border: 1px solid transparent;
   transition: ${({ theme }) =>
     theme.motion.reduced
       ? "none"
-      : `background-color ${theme.motion.duration.fast} ${theme.motion.easing.standard}`};
+      : [
+          `background-color ${theme.motion.duration.fast} ${theme.motion.easing.standard}`,
+          `color ${theme.motion.duration.fast} ${theme.motion.easing.standard}`,
+          `border-color ${theme.motion.duration.fast} ${theme.motion.easing.standard}`,
+        ].join(", ")};
   &:hover {
-    background-color: ${({ theme }) => theme.colors.surface.surfaceRaised};
+    color: ${({ theme }) => theme.colors.text.accent};
+    border-color: ${({ theme }) => theme.colors.border.subtle};
+    background-color: ${({ theme }) => theme.colors.surface.surfaceSunken};
   }
   &:focus-visible {
     outline: none;
@@ -163,7 +201,15 @@ function PreferencesPanel(): JSX.Element {
   };
 
   return (
-    <Card as="section" aria-labelledby="theme-controls-heading" padding="6">
+    <Card
+      as="section"
+      aria-labelledby="theme-controls-heading"
+      padding="6"
+      radius="xl"
+      shadow="sm"
+      border="subtle"
+      background="surfaceRaised"
+    >
       <Stack gap="4">
         <Stack gap="1">
           <Text as="h2" id="theme-controls-heading" variant="subtitle" weight="semibold">
@@ -213,13 +259,13 @@ export function App(): JSX.Element {
                 Explore the foundational atoms, composite molecules, and opinionated organisms built with Apollo UI primitives.
               </Text>
             </Stack>
-            <Stack direction="horizontal" gap="3" wrap as="nav" aria-label="Section navigation">
+            <Navigation aria-label="Section navigation">
               {NAVIGATION_LINKS.map((link) => (
                 <NavigationLink key={link.id} href={`#${link.id}`}>
                   {link.label}
                 </NavigationLink>
               ))}
-            </Stack>
+            </Navigation>
             <PreferencesPanel />
           </Stack>
           <AtomsSection />

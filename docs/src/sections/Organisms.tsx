@@ -2,6 +2,7 @@ import { Box, Button, Stack, Text } from "@apollo/ui";
 
 import { Section } from "../components/Section";
 import { ShowcaseCard } from "../components/ShowcaseCard";
+import { ShowcaseGrid } from "../components/ShowcaseGrid";
 import { AppShellDemo } from "../components/demos/AppShellDemo";
 import { DashboardDemo } from "../components/demos/DashboardDemo";
 
@@ -29,7 +30,7 @@ export function OrganismsSection(): JSX.Element {
       title="Organisms"
       description="High-order compositions that orchestrate atoms and molecules into product-ready experiences."
     >
-      <Stack direction="horizontal" gap="6" wrap>
+      <ShowcaseGrid>
         <ShowcaseCard
           tone="accent"
           title="Product update panel"
@@ -134,7 +135,7 @@ export function OrganismsSection(): JSX.Element {
             </Stack>
           </Stack>
         </ShowcaseCard>
-      </Stack>
+      </ShowcaseGrid>
     </Section>
   );
 }

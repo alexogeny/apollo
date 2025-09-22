@@ -56,6 +56,18 @@ export function Example(): JSX.Element {
 
 Design tokens can be accessed directly via `createTheme`, `lightTheme`, and `darkTheme`, or by reading `theme` from the provider context.
 
+## Documentation
+
+A documentation site built with Vite showcases Apollo UI atoms, molecules, and organisms. Run it locally with:
+
+```bash
+bun run docs:dev
+```
+
+Deployments are automated via GitHub Pages from the `Deploy documentation` workflow. Each build publishes the static site to the repository's Pages environment using the latest `main` branch.
+
 ## Testing
 
 All primitives ship with Bun-powered tests to verify rendering, theming, and accessibility behaviours. Run the suite with coverage enabled via `bun test --coverage`.
+
+Continuous integration is powered by GitHub Actions; the `CI` workflow runs `bun run typecheck`, the full test suite, and ensures the documentation bundle compiles on every push and pull request targeting `main`.

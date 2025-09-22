@@ -1,7 +1,11 @@
 import {
   forwardRef,
   type ButtonHTMLAttributes,
-  type Ref,
+  type ComponentPropsWithoutRef,
+  type ElementRef,
+  type ElementType,
+  type ForwardedRef,
+  type ReactElement,
 } from "react";
 import styled, { css } from "styled-components";
 
@@ -148,16 +152,27 @@ const StyledButton = styled.button.withConfig({
   }
 `;
 
-export interface ButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "color"> {
+type ButtonOwnProps = {
   readonly variant?: ButtonVariant;
   readonly tone?: ActionTone;
   readonly size?: ButtonSize;
   readonly fullWidth?: boolean;
-}
+};
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+type PolymorphicButtonProps<E extends ElementType> = ButtonOwnProps &
+  Omit<ComponentPropsWithoutRef<E>, keyof ButtonOwnProps | "color"> & {
+    readonly as?: E;
+  };
+
+export type ButtonProps<E extends ElementType = "button"> = PolymorphicButtonProps<E>;
+
+type ButtonComponent = <E extends ElementType = "button">(
+  props: ButtonProps<E> & { ref?: ForwardedRef<ElementRef<E>> },
+) => ReactElement | null;
+
+export const Button = forwardRef(function Button<E extends ElementType = "button">(
   {
+    as,
     variant = "solid",
     tone = "accent",
     size = "md",
@@ -165,13 +180,20 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     type,
     disabled,
     ...rest
-  },
-  ref,
+  }: ButtonProps<E>,
+  forwardedRef: ForwardedRef<unknown>,
 ) {
-  const buttonType = type ?? "button";
+  const Component = as ?? "button";
+  const isNativeButton = Component === "button";
+  const buttonType: ButtonHTMLAttributes<HTMLButtonElement>["type"] | undefined =
+    isNativeButton
+      ? (type as ButtonHTMLAttributes<HTMLButtonElement>["type"] | undefined) ?? "button"
+      : undefined;
+
   return (
     <StyledButton
-      ref={ref as Ref<HTMLButtonElement>}
+      as={Component}
+      ref={forwardedRef as ForwardedRef<ElementRef<E>>}
       type={buttonType}
       $variant={variant}
       $tone={tone}
@@ -181,10 +203,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       data-variant={variant}
       data-tone={tone}
       data-disabled={disabled ? "true" : undefined}
-      disabled={disabled}
-      {...rest}
+      disabled={isNativeButton ? disabled : undefined}
+      {...(rest as ComponentPropsWithoutRef<E>)}
     />
   );
-});
+}) as ButtonComponent;
 
-Button.displayName = "Button";
+(Button as ButtonComponent & { displayName?: string }).displayName = "Button";

@@ -323,7 +323,7 @@ const SidebarPanel = styled.div`
 const MainColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.space["14"]};
+  gap: ${({ theme }) => theme.space["12"]};
   min-width: 0;
 `;
 

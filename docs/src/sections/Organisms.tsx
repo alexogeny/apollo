@@ -2,6 +2,8 @@ import { Box, Button, Stack, Text } from "@apollo/ui";
 
 import { Section } from "../components/Section";
 import { ShowcaseCard } from "../components/ShowcaseCard";
+import { AppShellDemo } from "../components/demos/AppShellDemo";
+import { DashboardDemo } from "../components/demos/DashboardDemo";
 
 const UPDATE_HIGHLIGHTS = [
   "Expanded accent palette for accessibility",
@@ -19,12 +21,6 @@ const CHECKLIST: ReadonlyArray<ChecklistItem> = [
   { label: "Adopt new button variants", complete: false },
   { label: "Audit custom surfaces", complete: false },
 ];
-
-const TEAM_METRICS = [
-  { label: "In-flight projects", value: "5", helper: "Design system adoption" },
-  { label: "Design reviews", value: "18", helper: "Last 7 days" },
-  { label: "Contributors", value: "42", helper: "Across product teams" },
-] as const;
 
 export function OrganismsSection(): JSX.Element {
   return (
@@ -80,46 +76,16 @@ export function OrganismsSection(): JSX.Element {
           </Stack>
         </ShowcaseCard>
         <ShowcaseCard
-          title="Team health dashboard"
-          description="Organize molecules into responsive panels that summarize ongoing design system efforts."
+          title="Application shell"
+          description="Sidebar navigation, top-level actions, and content panels compose into a cohesive workspace chrome."
         >
-          <Stack gap="4">
-            <Stack direction="horizontal" gap="3" wrap>
-              {TEAM_METRICS.map((metric) => (
-                <Box
-                  key={metric.label}
-                  padding="4"
-                  radius="lg"
-                  shadow="xs"
-                  background="surface"
-                  border="subtle"
-                  style={{ flex: "1 1 180px" }}
-                >
-                  <Stack gap="1">
-                    <Text variant="subtitle" weight="semibold">
-                      {metric.value}
-                    </Text>
-                    <Text variant="detail" color="secondary">
-                      {metric.label}
-                    </Text>
-                    <Text variant="detail" color="muted">
-                      {metric.helper}
-                    </Text>
-                  </Stack>
-                </Box>
-              ))}
-            </Stack>
-            <Box padding="4" radius="lg" background="surfaceSunken" border="none">
-              <Stack gap="2">
-                <Text variant="detail" color="secondary">
-                  Next milestone
-                </Text>
-                <Text variant="body">
-                  Publish accessibility audit for the marketing site and integrate the new high-contrast palette tokens.
-                </Text>
-              </Stack>
-            </Box>
-          </Stack>
+          <AppShellDemo />
+        </ShowcaseCard>
+        <ShowcaseCard
+          title="Design ops dashboard"
+          description="Combine data tables, metrics, and pickers to track adoption and accessibility outcomes."
+        >
+          <DashboardDemo />
         </ShowcaseCard>
         <ShowcaseCard
           title="Onboarding checklist"

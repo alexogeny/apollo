@@ -1,16 +1,13 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import {
-  Badge,
-  Box,
-  Button,
-  Card,
-  DataTable,
-  DatePicker,
-  Progress,
+  Dashboard,
   Stack,
   Text,
+  type DashboardActivity,
+  type DashboardMetric,
   type DataTableColumn,
+  type SidebarSection,
 } from "@apollo/ui";
 
 interface WorkstreamRow {
@@ -21,115 +18,139 @@ interface WorkstreamRow {
   readonly updated: string;
 }
 
-const STATUS_TONE: Record<WorkstreamRow["status"], "success" | "warning" | "neutral"> = {
-  Ready: "success",
-  "In review": "warning",
-  Draft: "neutral",
-};
-
 const WORKSTREAM_ROWS: ReadonlyArray<WorkstreamRow> = [
   { id: 1, name: "Navigation shell", status: "Ready", owner: "Alex Morgan", updated: "2 days ago" },
   { id: 2, name: "Command palette", status: "In review", owner: "Priya Das", updated: "5 days ago" },
   { id: 3, name: "Context menu", status: "Draft", owner: "Liam Patel", updated: "1 day ago" },
 ];
 
+const ACTIVITIES: ReadonlyArray<DashboardActivity> = [
+  {
+    id: "activity-1",
+    title: "Modal refresh shipped",
+    description: "Updated focus traps and density tokens",
+    timestamp: "Today • 14:05",
+  },
+  {
+    id: "activity-2",
+    title: "Accessibility audit",
+    description: "Resolved contrast issues for overlays",
+    timestamp: "Yesterday • 09:12",
+  },
+  {
+    id: "activity-3",
+    title: "Command palette launched",
+    description: "Released to product teams for beta feedback",
+    timestamp: "2 days ago",
+  },
+];
+
+const METRICS: ReadonlyArray<DashboardMetric> = [
+  {
+    id: "ready",
+    label: "Components ready",
+    value: "18 / 24",
+    helper: "Ready to publish",
+    progress: { value: 75, label: "Components ready" },
+  },
+  {
+    id: "accessibility",
+    label: "Accessibility issues",
+    value: "3",
+    trend: { label: "5 resolved this week", tone: "positive" },
+    helper: "Focus on overlays",
+  },
+  {
+    id: "contributors",
+    label: "Contributors",
+    value: "42",
+    trend: { label: "+6 vs last month", tone: "positive" },
+    helper: "Across product teams",
+  },
+];
+
 export function DashboardDemo(): JSX.Element {
-  const columns = useMemo<ReadonlyArray<DataTableColumn<WorkstreamRow>>>(() => [
-    {
-      id: "component",
-      header: "Component",
-      accessor: (row) => row.name,
-      sortable: true,
-    },
-    {
-      id: "status",
-      header: "Status",
-      accessor: (row) => row.status,
-      cell: (row) => (
-        <Badge variant="subtle" tone={STATUS_TONE[row.status]}>
-          {row.status}
-        </Badge>
-      ),
-    },
-    {
-      id: "owner",
-      header: "Owner",
-      accessor: (row) => row.owner,
-    },
-    {
-      id: "updated",
-      header: "Updated",
-      accessor: (row) => row.updated,
-      sortable: true,
-      align: "right",
-    },
-  ], []);
+  const [filter, setFilter] = useState<"review" | "all">("review");
+
+  const columns = useMemo<ReadonlyArray<DataTableColumn<WorkstreamRow>>>(
+    () => [
+      { id: "component", header: "Component", accessor: (row) => row.name, sortable: true },
+      { id: "status", header: "Status", accessor: (row) => row.status },
+      { id: "owner", header: "Owner", accessor: (row) => row.owner },
+      { id: "updated", header: "Updated", accessor: (row) => row.updated, sortable: true, align: "right" },
+    ],
+    [],
+  );
+
+  const sidebarSections = useMemo<ReadonlyArray<SidebarSection>>(
+    () => [
+      {
+        id: "primary-nav",
+        title: "Navigation",
+        items: [
+          { id: "overview", label: "Overview", description: "Health & adoption", href: "#" },
+          { id: "workstreams", label: "Workstreams", description: "24 tracked", href: "#" },
+          { id: "reports", label: "Reports", description: "Stakeholder updates", href: "#" },
+        ],
+      },
+      {
+        id: "support-nav",
+        title: "Resources",
+        items: [
+          { id: "accessibility", label: "Accessibility", description: "Audit log", href: "#" },
+          { id: "changelog", label: "Changelog", description: "Release history", href: "#" },
+        ],
+      },
+    ],
+    [],
+  );
+
+  const filteredRows = useMemo(
+    () =>
+      filter === "review"
+        ? WORKSTREAM_ROWS.filter((row) => row.status !== "Ready")
+        : WORKSTREAM_ROWS,
+    [filter],
+  );
 
   return (
-    <Stack gap="5">
-      <Stack direction="horizontal" align="center" justify="space-between" wrap gap="4">
-        <Stack gap="1">
-          <Text as="h4" variant="subtitle" weight="semibold">
-            Release readiness dashboard
+    <Dashboard<WorkstreamRow>
+      title="Release readiness overview"
+      description="Monitor component progress, accessibility quality, and recent activity from a single workspace."
+      sidebar={{
+        sections: sidebarSections,
+        activeItemId: "overview",
+        ariaLabel: "Design operations navigation",
+        header: (
+          <Stack gap="2">
+            <Text as="span" variant="bodySm" weight="semibold">
+              Design ops
+            </Text>
+            <Text as="span" variant="detail" color="secondary">
+              Release readiness
+            </Text>
+          </Stack>
+        ),
+        footer: (
+          <Text as="span" variant="detail" color="secondary">
+            Snapshot updated 5 minutes ago.
           </Text>
-          <Text as="p" variant="detail" color="secondary">
-            Monitor component health, adoption velocity, and review progress.
-          </Text>
-        </Stack>
-        <Stack direction="horizontal" gap="3" align="center" wrap>
-          <DatePicker placeholder="Filter by milestone" />
-          <Button size="sm" variant="outline" tone="neutral">
-            Export report
-          </Button>
-        </Stack>
-      </Stack>
-      <Stack direction="horizontal" gap="4" wrap>
-        <Card padding="4" radius="lg" shadow="xs" background="surfaceRaised" style={{ flex: "1 1 180px" }}>
-          <Stack gap="2">
-            <Text as="span" variant="detail" color="secondary">
-              Components ready
-            </Text>
-            <Text as="span" variant="headline" weight="semibold">
-              18 / 24
-            </Text>
-            <Progress value={75} label="Components ready" />
-            <Text as="span" variant="detail" color="muted">
-              Ready to publish to kits
-            </Text>
-          </Stack>
-        </Card>
-        <Card padding="4" radius="lg" shadow="xs" background="surfaceRaised" style={{ flex: "1 1 180px" }}>
-          <Stack gap="2">
-            <Text as="span" variant="detail" color="secondary">
-              Accessibility issues
-            </Text>
-            <Text as="span" variant="headline" weight="semibold">
-              3 open
-            </Text>
-            <Progress value={40} tone="warning" label="Accessibility issues" />
-            <Text as="span" variant="detail" color="muted">
-              Focus on overlay primitives
-            </Text>
-          </Stack>
-        </Card>
-        <Card padding="4" radius="lg" shadow="xs" background="surfaceRaised" style={{ flex: "1 1 180px" }}>
-          <Stack gap="2">
-            <Text as="span" variant="detail" color="secondary">
-              Contributors
-            </Text>
-            <Text as="span" variant="headline" weight="semibold">
-              42
-            </Text>
-            <Progress value={90} tone="accent" label="Contributor growth" />
-            <Text as="span" variant="detail" color="muted">
-              Across product teams
-            </Text>
-          </Stack>
-        </Card>
-      </Stack>
-      <Box padding="4" radius="lg" shadow="xs" background="surfaceRaised">
-        <DataTable data={WORKSTREAM_ROWS} columns={columns} caption="Component review status" />
-      </Box>
-    </Stack>
+        ),
+      }}
+      metrics={METRICS}
+      activities={ACTIVITIES}
+      filters={[
+        { id: "review", label: "In review", active: filter === "review", onSelect: () => setFilter("review") },
+        { id: "all", label: "All workstreams", active: filter === "all", onSelect: () => setFilter("all") },
+      ]}
+      table={{
+        title: "Workstream queue",
+        description: "Track design and accessibility readiness across teams.",
+        data: filteredRows,
+        columns,
+      }}
+      primaryAction={{ id: "new", label: "New workstream" }}
+      secondaryAction={{ id: "share", label: "Share report", variant: "outline", tone: "neutral" }}
+    />
   );
 }

@@ -1,4 +1,19 @@
-import { Box, Button, Stack, Text } from "@apollo/ui";
+import {
+  Avatar,
+  Badge,
+  Box,
+  Button,
+  Card,
+  Checkbox,
+  Progress,
+  RadioGroup,
+  RadioGroupItem,
+  Skeleton,
+  Spinner,
+  Stack,
+  Switch,
+  Text,
+} from "@apollo/ui";
 
 import { Section } from "../components/Section";
 import { ShowcaseCard } from "../components/ShowcaseCard";
@@ -13,6 +28,12 @@ const SURFACE_EXAMPLES: ReadonlyArray<SurfaceExample> = [
   { token: "surface", label: "Surface", textColor: "primary" },
   { token: "surfaceRaised", label: "Raised", textColor: "primary" },
   { token: "surfaceContrast", label: "Contrast", textColor: "contrast" },
+];
+
+const TEAM_MEMBERS = [
+  { id: "aria", name: "Aria Chen", status: "online" as const },
+  { id: "diego", name: "Diego Patel", status: "busy" as const },
+  { id: "morgan", name: "Morgan Lee", status: "offline" as const },
 ];
 
 export function AtomsSection(): JSX.Element {
@@ -101,6 +122,98 @@ export function AtomsSection(): JSX.Element {
               <Button size="xs">Extra small</Button>
               <Button size="md">Medium</Button>
               <Button size="lg">Large format</Button>
+            </Stack>
+          </Stack>
+        </ShowcaseCard>
+        <ShowcaseCard
+          title="Surfaces & layout"
+          description="Combine Card and Stack primitives to organize dense interface regions with balanced spacing."
+        >
+          <Stack gap="3">
+            <Stack direction="horizontal" gap="3" wrap>
+              <Card padding="4" radius="lg" shadow="xs" background="surfaceRaised" style={{ flex: "1 1 200px" }}>
+                <Stack gap="2">
+                  <Text as="span" variant="detail" color="secondary">
+                    Guidance update
+                  </Text>
+                  <Text as="h4" variant="subtitle" weight="semibold">
+                    Publish new input patterns
+                  </Text>
+                  <Button size="sm" variant="outline" tone="neutral">
+                    View guidance
+                  </Button>
+                </Stack>
+              </Card>
+              <Card tone="accent" padding="4" radius="lg" shadow="xs" style={{ flex: "1 1 200px" }}>
+                <Stack gap="2">
+                  <Text as="span" variant="detail" weight="semibold">
+                    Token library
+                  </Text>
+                  <Text as="p" variant="body">
+                    Density-aware spacing and responsive typography travel with Stack layouts.
+                  </Text>
+                </Stack>
+              </Card>
+            </Stack>
+          </Stack>
+        </ShowcaseCard>
+        <ShowcaseCard
+          title="Selection controls"
+          description="Checkbox, radio group, and switch primitives ship accessible form semantics by default."
+        >
+          <Stack gap="3">
+            <Checkbox label="Notify team" description="Send weekly status summaries" defaultChecked />
+            <RadioGroup defaultValue="comfortable" orientation="horizontal" aria-label="Density">
+              <RadioGroupItem value="comfortable" label="Comfortable" />
+              <RadioGroupItem value="compact" label="Compact" />
+            </RadioGroup>
+            <Switch label="Enable analytics" defaultChecked />
+          </Stack>
+        </ShowcaseCard>
+        <ShowcaseCard
+          title="Avatars & skeletons"
+          description="Represent collaborators with initials-based avatars and smooth-loading skeleton placeholders."
+        >
+          <Stack gap="3">
+            <Stack direction="horizontal" gap="3" wrap align="center">
+              {TEAM_MEMBERS.map((member) => (
+                <Avatar key={member.id} name={member.name} status={member.status} size="md" />
+              ))}
+            </Stack>
+            <Card padding="4" radius="lg" shadow="xs" background="surfaceSunken">
+              <Stack gap="2">
+                <Skeleton width="70%" height="0.9rem" radius="sm" />
+                <Skeleton width="85%" height="0.75rem" radius="sm" />
+                <Skeleton width="55%" height="0.75rem" radius="sm" />
+              </Stack>
+            </Card>
+          </Stack>
+        </ShowcaseCard>
+        <ShowcaseCard
+          title="Status indicators"
+          description="Badges, progress, and spinners communicate real-time status with tone-aware palettes."
+        >
+          <Stack gap="3">
+            <Stack direction="horizontal" gap="2" wrap align="center">
+              <Badge tone="accent">New</Badge>
+              <Badge tone="success" variant="subtle">
+                Live
+              </Badge>
+              <Badge tone="warning" variant="outline">
+                Attention
+              </Badge>
+            </Stack>
+            <Stack gap="2">
+              <Text as="span" variant="detail" color="secondary">
+                Publishing tokens
+              </Text>
+              <Progress value={64} label="Publishing tokens" />
+            </Stack>
+            <Stack direction="horizontal" gap="3" align="center">
+              <Spinner size="sm" label="Loading components" />
+              <Text as="span" variant="detail" color="secondary">
+                Loading component documentation…
+              </Text>
             </Stack>
           </Stack>
         </ShowcaseCard>

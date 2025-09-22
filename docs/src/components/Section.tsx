@@ -11,7 +11,13 @@ export interface SectionProps {
 
 export function Section({ id, title, description, children }: SectionProps): JSX.Element {
   return (
-    <Stack as="section" id={id} gap="5" aria-labelledby={`${id}-title`}>
+    <Stack
+      as="section"
+      id={id}
+      gap="5"
+      aria-labelledby={`${id}-title`}
+      style={{ scrollMarginTop: "96px" }}
+    >
       <Stack gap="1">
         <Text as="h2" id={`${id}-title`} variant="title" weight="semibold">
           {title}

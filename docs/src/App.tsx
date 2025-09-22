@@ -13,6 +13,7 @@ import {
   useApolloTheme,
 } from "@apollo/ui";
 
+import { Section } from "./components/Section";
 import { AtomsSection } from "./sections/Atoms";
 import { MoleculesSection } from "./sections/Molecules";
 import { OrganismsSection } from "./sections/Organisms";
@@ -36,6 +37,9 @@ const GlobalStyles = createGlobalStyle`
   *, *::before, *::after {
     box-sizing: border-box;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     margin: 0;
     font-family: ${({ theme }) => theme.typography.fonts.sans};
@@ -53,58 +57,264 @@ const GlobalStyles = createGlobalStyle`
   }
   a {
     color: inherit;
+    text-decoration: none;
   }
 `;
 
-const NAVIGATION_LINKS: ReadonlyArray<{
+interface NavigationItem {
   readonly id: string;
   readonly label: string;
   readonly description: string;
   readonly badgeLabel?: string;
-}> = [
+}
+
+interface NavigationGroup {
+  readonly id: string;
+  readonly title: string;
+  readonly items: ReadonlyArray<NavigationItem>;
+}
+
+const DOC_NAVIGATION: ReadonlyArray<NavigationGroup> = [
   {
-    id: "atoms",
-    label: "Atoms",
-    description: "Foundational tokens and primitives",
+    id: "guide",
+    title: "Guide",
+    items: [
+      {
+        id: "overview",
+        label: "Overview",
+        description: "Understand the Apollo UI design system",
+      },
+      {
+        id: "installation",
+        label: "Installation",
+        description: "Install the package and wire the provider",
+      },
+      {
+        id: "theming",
+        label: "Theming",
+        description: "Preview density, contrast, and tokens",
+      },
+    ],
   },
   {
-    id: "molecules",
-    label: "Molecules",
-    description: "Composable patterns and overlays",
+    id: "catalog",
+    title: "Component catalog",
+    items: [
+      {
+        id: "atoms",
+        label: "Atoms",
+        description: "Foundational tokens and primitives",
+      },
+      {
+        id: "molecules",
+        label: "Molecules",
+        description: "Composable interaction patterns",
+      },
+      {
+        id: "organisms",
+        label: "Organisms",
+        description: "Application-level scaffolds",
+        badgeLabel: "New",
+      },
+    ],
   },
   {
-    id: "organisms",
-    label: "Organisms",
-    description: "Product-ready experience templates",
-    badgeLabel: "New",
+    id: "resources-nav",
+    title: "Resources",
+    items: [
+      {
+        id: "resources",
+        label: "Resources",
+        description: "Release notes, tokens, and support",
+      },
+    ],
+  },
+];
+
+const SECTION_IDS = DOC_NAVIGATION.flatMap((group) => group.items.map((item) => item.id));
+
+interface CatalogFeature {
+  readonly id: string;
+  readonly title: string;
+  readonly description: string;
+  readonly actionLabel: string;
+  readonly href: string;
+  readonly badge?: string;
+}
+
+const CATALOG_FEATURES: ReadonlyArray<CatalogFeature> = [
+  {
+    id: "feature-atoms",
+    title: "Atoms",
+    description: "Tokens, surfaces, and primitive controls tuned for accessibility.",
+    actionLabel: "Review atoms",
+    href: "#atoms",
+    badge: "Foundations",
+  },
+  {
+    id: "feature-molecules",
+    title: "Molecules",
+    description: "Dialogs, menus, tables, and overlays composed from atoms.",
+    actionLabel: "Preview molecules",
+    href: "#molecules",
+    badge: "Patterns",
+  },
+  {
+    id: "feature-organisms",
+    title: "Organisms",
+    description: "Dashboard layouts and app shells ready for product teams.",
+    actionLabel: "Open organisms",
+    href: "#organisms",
+    badge: "Experiences",
+  },
+  {
+    id: "feature-playground",
+    title: "Developer playground",
+    description: "Tune appearance, density, and contrast with live components.",
+    actionLabel: "Launch theming controls",
+    href: "#theming",
+    badge: "Interactive",
+  },
+];
+
+interface InstallStep {
+  readonly id: string;
+  readonly title: string;
+  readonly description: string;
+  readonly code: string;
+  readonly ariaLabel: string;
+  readonly hint?: string;
+}
+const INSTALL_STEPS: ReadonlyArray<InstallStep> = [
+  {
+    id: "install-packages",
+    title: "Install the packages",
+    description: "Add @apollo/ui and styled-components to your project using your package manager of choice.",
+    code: "bun add @apollo/ui styled-components",
+    ariaLabel: "Command to install Apollo UI and styled-components",
+    hint: "Apollo UI targets React 18+ and pairs with the styled-components v6 runtime.",
+  },
+  {
+    id: "wrap-provider",
+    title: "Wrap your application",
+    description: "Provide the ApolloThemeProvider near the root of your app to unlock tokens and preference controls.",
+    code: `import { ApolloThemeProvider } from "@apollo/ui";
+
+export function App() {
+  return (
+    <ApolloThemeProvider>
+      <YourProduct />
+    </ApolloThemeProvider>
+  );
+}`,
+    ariaLabel: "Example of wrapping an application with ApolloThemeProvider",
+    hint: "The provider respects system appearance, density, motion, and high-contrast preferences out of the box.",
+  },
+];
+
+interface ThemeApiPoint {
+  readonly id: string;
+  readonly label: string;
+  readonly description: string;
+}
+
+const THEME_API_POINTS: ReadonlyArray<ThemeApiPoint> = [
+  {
+    id: "appearance",
+    label: "appearance",
+    description: "Resolved light or dark theme derived from the user's preference.",
+  },
+  {
+    id: "setAppearance",
+    label: "setAppearance(next)",
+    description: "Override appearance programmatically to preview themes.",
+  },
+  {
+    id: "density",
+    label: "density",
+    description: "Active spacing scale (comfortable or compact) used across components.",
+  },
+  {
+    id: "highContrast",
+    label: "highContrast",
+    description: "Boolean flag indicating when contrast-enhanced tokens are active.",
+  },
+];
+
+interface ResourceItem {
+  readonly id: string;
+  readonly title: string;
+  readonly description: string;
+  readonly actionLabel: string;
+  readonly href: string;
+  readonly target?: "_blank";
+  readonly rel?: string;
+  readonly badge?: string;
+}
+
+const RESOURCE_ITEMS: ReadonlyArray<ResourceItem> = [
+  {
+    id: "resource-changelog",
+    title: "Changelog",
+    description: "Track changes to tokens, primitives, and high-level patterns as they ship.",
+    actionLabel: "View release notes",
+    href: "https://github.com/apollo/ui/releases",
+    target: "_blank",
+    rel: "noreferrer",
+    badge: "Updated weekly",
+  },
+  {
+    id: "resource-tokens",
+    title: "Design tokens",
+    description: "Explore the source of truth for colors, typography, spacing, and motion values.",
+    actionLabel: "Browse theme tokens",
+    href: "https://github.com/apollo/ui/tree/main/src/theme",
+    target: "_blank",
+    rel: "noreferrer",
+  },
+  {
+    id: "resource-support",
+    title: "Support",
+    description: "Join the #apollo-ui channel or email the design systems team for implementation help.",
+    actionLabel: "Email design@apollo.dev",
+    href: "mailto:design@apollo.dev",
+    badge: "Team inbox",
   },
 ];
 
 const Layout = styled.div`
   display: grid;
-  gap: ${({ theme }) => theme.space["10"]};
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: ${({ theme }) => theme.space["12"]};
+  grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
   align-items: start;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: ${({ theme }) => `${theme.space["10"]} ${theme.space["6"]}`};
+  padding: ${({ theme }) => `${theme.space["12"]} ${theme.space["8"]}`};
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1200px) {
+    grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
+  }
+
+  @media (max-width: 1040px) {
     grid-template-columns: minmax(0, 1fr);
+    padding: ${({ theme }) => `${theme.space["10"]} ${theme.space["6"]}`};
+  }
+
+  @media (max-width: 720px) {
     padding: ${({ theme }) => `${theme.space["8"]} ${theme.space["5"]}`};
   }
 `;
 
 const SidebarPanel = styled.div`
   position: sticky;
-  top: ${({ theme }) => theme.space["8"]};
+  top: ${({ theme }) => theme.space["10"]};
   align-self: start;
-  max-height: ${({ theme }) => `calc(100vh - (${theme.space["8"]} * 2))`};
+  max-height: ${({ theme }) => `calc(100vh - (${theme.space["10"]} * 2))`};
   width: 100%;
   display: flex;
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1040px) {
     position: static;
     max-height: none;
   }
@@ -117,6 +327,73 @@ const MainColumn = styled.div`
   min-width: 0;
 `;
 
+const HeroSection = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.space["8"]};
+  scroll-margin-top: ${({ theme }) => `calc(${theme.space["12"]} + ${theme.space["4"]})`};
+`;
+
+const HeroContentGrid = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.space["6"]};
+  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+  align-items: stretch;
+
+  @media (max-width: 960px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+`;
+
+const FeatureGrid = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.space["4"]};
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+`;
+
+const InstallGrid = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.space["6"]};
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+`;
+
+const ThemingGrid = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.space["6"]};
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+`;
+
+const ResourceGrid = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.space["6"]};
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+`;
+
+const CodeBlock = styled.pre`
+  margin: 0;
+  padding: ${({ theme }) => `${theme.space["3"]} ${theme.space["4"]}`};
+  background: ${({ theme }) => theme.colors.surface.surface};
+  border: 1px solid ${({ theme }) => theme.colors.border.subtle};
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: ${({ theme }) => theme.typography.variants.code.fontSize};
+  line-height: ${({ theme }) => theme.typography.variants.code.lineHeight};
+  letter-spacing: ${({ theme }) => theme.typography.variants.code.letterSpacing};
+  color: ${({ theme }) => theme.colors.text.primary};
+  overflow-x: auto;
+  tab-size: 2;
+`;
+
+const InlineCode = styled(Text).attrs({
+  as: "code",
+  variant: "code",
+})`
+  display: inline-flex;
+  align-items: center;
+  padding: 0 ${({ theme }) => theme.space["2"]};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.surface.surfaceSunken};
+`;
 interface ToggleOption<T extends string> {
   readonly value: T;
   readonly label: string;
@@ -167,8 +444,11 @@ type DensityToggleValue = "comfortable" | "compact";
 
 type AppearanceToggleValue = AppearanceOption;
 
-function PreferencesPanel(): JSX.Element {
+type ThemeSummaryTone = "accent" | "neutral" | "warning";
+
+function ThemePlayground(): JSX.Element {
   const {
+    appearance,
     appearancePreference,
     setAppearance,
     density,
@@ -207,6 +487,35 @@ function PreferencesPanel(): JSX.Element {
     [],
   );
 
+  const summaryItems = useMemo<
+    ReadonlyArray<{ id: string; label: string; value: string; tone: ThemeSummaryTone }>
+  >(
+    () => [
+      {
+        id: "appearance",
+        label: "Appearance",
+        value:
+          appearancePreference === "system"
+            ? `System (${appearance})`
+            : appearancePreference,
+        tone: "accent",
+      },
+      {
+        id: "density",
+        label: "Density",
+        value: density,
+        tone: "neutral",
+      },
+      {
+        id: "contrast",
+        label: "Contrast",
+        value: highContrast ? "High" : "Standard",
+        tone: highContrast ? "warning" : "neutral",
+      },
+    ],
+    [appearance, appearancePreference, density, highContrast],
+  );
+
   const handleContrastChange = (next: ContrastToggleValue) => {
     setHighContrast(next === "enabled");
   };
@@ -214,21 +523,30 @@ function PreferencesPanel(): JSX.Element {
   return (
     <Card
       as="section"
-      aria-labelledby="theme-controls-heading"
+      aria-labelledby="theme-playground-heading"
       padding="6"
-      radius="xl"
-      shadow="sm"
+      radius="lg"
+      shadow="xs"
       border="subtle"
       background="surfaceRaised"
     >
-      <Stack gap="4">
-        <Stack gap="1">
-          <Text as="h2" id="theme-controls-heading" variant="subtitle" weight="semibold">
-            Theme controls
-          </Text>
-          <Text as="p" variant="body" color="secondary">
-            Toggle appearance preferences to preview how primitives respond to density and contrast changes.
-          </Text>
+      <Stack gap="5">
+        <Stack gap="2">
+          <Stack gap="1">
+            <Text as="h3" id="theme-playground-heading" variant="subtitle" weight="semibold">
+              Theming controls
+            </Text>
+            <Text as="p" variant="body" color="secondary">
+              Adjust appearance, density, and high-contrast modes to preview how components respond in real time.
+            </Text>
+          </Stack>
+          <Stack direction="horizontal" gap="2" wrap>
+            {summaryItems.map((item) => (
+              <Badge key={item.id} variant="subtle" tone={item.tone}>
+                {item.label}: {item.value}
+              </Badge>
+            ))}
+          </Stack>
         </Stack>
         <Stack direction="horizontal" gap="6" wrap>
           <ToggleGroup<AppearanceToggleValue>
@@ -254,26 +572,24 @@ function PreferencesPanel(): JSX.Element {
     </Card>
   );
 }
-
 export function App(): JSX.Element {
-  const [activeSection, setActiveSection] = useState<string>(NAVIGATION_LINKS[0]?.id ?? "atoms");
+  const [activeSection, setActiveSection] = useState<string>(SECTION_IDS[0] ?? "overview");
 
   const sidebarSections = useMemo<ReadonlyArray<SidebarSection>>(
-    () => [
-      {
-        id: "page-navigation",
-        title: "On this page",
-        items: NAVIGATION_LINKS.map((link) => ({
-          id: link.id,
-          label: link.label,
-          description: link.description,
-          href: `#${link.id}`,
-          badge: link.badgeLabel
-            ? { label: link.badgeLabel, tone: "accent", variant: "subtle" }
+    () =>
+      DOC_NAVIGATION.map((group) => ({
+        id: group.id,
+        title: group.title,
+        items: group.items.map((item) => ({
+          id: item.id,
+          label: item.label,
+          description: item.description,
+          href: `#${item.id}`,
+          badge: item.badgeLabel
+            ? { label: item.badgeLabel, tone: "accent", variant: "subtle" }
             : undefined,
         })),
-      },
-    ],
+      })),
     [],
   );
 
@@ -299,7 +615,7 @@ export function App(): JSX.Element {
       { rootMargin: "-40% 0px -40% 0px", threshold: 0.25 },
     );
 
-    const elements = NAVIGATION_LINKS.map((link) => document.getElementById(link.id)).filter(
+    const elements = SECTION_IDS.map((sectionId) => document.getElementById(sectionId)).filter(
       (element): element is HTMLElement => element !== null,
     );
     elements.forEach((element) => observer.observe(element));
@@ -316,29 +632,29 @@ export function App(): JSX.Element {
             sections={sidebarSections}
             activeItemId={activeSection}
             onItemSelect={handleItemSelect}
-            ariaLabel="Documentation navigation"
+            ariaLabel="Apollo UI documentation navigation"
             header={
-              <Stack gap="2">
-                <Text as="span" variant="subtitle" weight="semibold">
-                  Apollo UI
-                </Text>
-                <Stack direction="horizontal" gap="2" align="center">
+              <Stack gap="3">
+                <Stack direction="horizontal" gap="2" align="center" wrap>
                   <Badge variant="subtle" tone="accent">
+                    Apollo UI
+                  </Badge>
+                  <Badge variant="outline" tone="neutral">
+                    Docs
+                  </Badge>
+                  <Badge variant="outline" tone="neutral">
                     v0.3 preview
                   </Badge>
-                  <Text as="span" variant="detail" color="secondary">
-                    Design system
-                  </Text>
                 </Stack>
-                <Text as="p" variant="detail" color="secondary">
-                  Navigate foundational atoms, expressive molecules, and opinionated organisms.
+                <Text as="span" variant="detail" color="secondary">
+                  Compose interfaces with atomic primitives, expressive molecules, and production-ready organisms.
                 </Text>
               </Stack>
             }
             footer={
               <Stack gap="2">
                 <Text as="span" variant="detail" color="secondary">
-                  Need a hand? Join the #apollo-ui channel or reach out at
+                  Need support? Visit resources below or reach out to the design systems team.
                 </Text>
                 <Text as="a" href="mailto:design@apollo.dev" variant="detail" color="accent">
                   design@apollo.dev
@@ -348,32 +664,218 @@ export function App(): JSX.Element {
           />
         </SidebarPanel>
         <MainColumn>
-          <Stack as="header" gap="6">
-            <Stack gap="3">
-              <Stack direction="horizontal" gap="2" align="center">
-                <Badge variant="subtle" tone="accent">
-                  Update
-                </Badge>
-                <Text as="span" variant="detail" color="secondary">
-                  Sidebar molecule and dashboard organism just landed.
-                </Text>
+          <HeroSection id="overview" aria-labelledby="overview-heading">
+            <HeroContentGrid>
+              <Stack gap="4">
+                <Stack direction="horizontal" gap="2" align="center" wrap>
+                  <Badge variant="subtle" tone="accent">
+                    Apollo UI
+                  </Badge>
+                  <Badge variant="outline" tone="neutral">
+                    React 18
+                  </Badge>
+                  <Badge variant="outline" tone="neutral">
+                    v0.3 preview
+                  </Badge>
+                </Stack>
+                <Stack gap="2">
+                  <Text as="h1" id="overview-heading" variant="display" weight="semibold" wrap="balance">
+                    Build polished product surfaces with atomic clarity
+                  </Text>
+                  <Text as="p" variant="body" color="secondary">
+                    Compose atoms, molecules, and organisms to deliver accessible experiences with a single theme contract.
+                  </Text>
+                  <Text as="p" variant="detail" color="secondary">
+                    Apollo UI pairs modern React patterns with an adaptive design token system so product teams can ship faster.
+                  </Text>
+                </Stack>
+                <Stack direction="horizontal" gap="3" wrap>
+                  <Button size="sm" as="a" href="#installation">
+                    Get started
+                  </Button>
+                  <Button size="sm" variant="outline" tone="neutral" as="a" href="#molecules">
+                    Browse components
+                  </Button>
+                </Stack>
               </Stack>
-              <Stack gap="2">
-                <Text as="h1" variant="headline" weight="semibold" wrap="balance">
-                  Apollo UI design system documentation
-                </Text>
-                <Text as="p" variant="body" color="secondary">
-                  Explore the foundational atoms, composite molecules, and production-ready organisms built with Apollo UI primitives.
-                </Text>
-              </Stack>
-            </Stack>
-            <PreferencesPanel />
-          </Stack>
+              <Card padding="6" radius="xl" shadow="xs" border="subtle" background="surfaceSunken">
+                <Stack gap="4">
+                  <Stack gap="1">
+                    <Text as="span" variant="detail" color="secondary">
+                      Quick start
+                    </Text>
+                    <Text as="span" variant="subtitle" weight="semibold">
+                      Install and wrap your application
+                    </Text>
+                  </Stack>
+                  <CodeBlock aria-label="Install Apollo UI">
+                    bun add @apollo/ui styled-components
+                  </CodeBlock>
+                  <CodeBlock aria-label="Wrap your product with ApolloThemeProvider">
+{`import { ApolloThemeProvider } from "@apollo/ui";
+
+export function App() {
+  return (
+    <ApolloThemeProvider>
+      <YourProduct />
+    </ApolloThemeProvider>
+  );
+}`}
+                  </CodeBlock>
+                  <Text as="p" variant="detail" color="secondary">
+                    Every primitive honors density, appearance, reduced motion, and high-contrast preferences by default.
+                  </Text>
+                </Stack>
+              </Card>
+            </HeroContentGrid>
+            <FeatureGrid>
+              {CATALOG_FEATURES.map((feature) => (
+                <Card
+                  key={feature.id}
+                  padding="5"
+                  radius="lg"
+                  shadow="none"
+                  border="subtle"
+                  background="surfaceSunken"
+                >
+                  <Stack gap="3">
+                    {feature.badge ? (
+                      <Badge variant="subtle" tone="accent">
+                        {feature.badge}
+                      </Badge>
+                    ) : null}
+                    <Text as="h3" variant="subtitle" weight="semibold">
+                      {feature.title}
+                    </Text>
+                    <Text as="p" variant="detail" color="secondary">
+                      {feature.description}
+                    </Text>
+                    <Button size="sm" variant="ghost" tone="accent" as="a" href={feature.href}>
+                      {feature.actionLabel}
+                    </Button>
+                  </Stack>
+                </Card>
+              ))}
+            </FeatureGrid>
+          </HeroSection>
+          <Section
+            id="installation"
+            title="Installation"
+            description="Add Apollo UI to your stack and initialize the theming provider."
+          >
+            <InstallGrid>
+              {INSTALL_STEPS.map((step, index) => (
+                <Card key={step.id} padding="6" radius="lg" shadow="xs" border="subtle" background="surface">
+                  <Stack gap="4">
+                    <Stack gap="2">
+                      <Stack direction="horizontal" gap="2" align="center">
+                        <Badge variant="subtle" tone="accent">
+                          Step {index + 1}
+                        </Badge>
+                      </Stack>
+                      <Text as="h3" variant="subtitle" weight="semibold">
+                        {step.title}
+                      </Text>
+                      <Text as="p" variant="body" color="secondary">
+                        {step.description}
+                      </Text>
+                    </Stack>
+                    <CodeBlock aria-label={step.ariaLabel}>{step.code}</CodeBlock>
+                    {step.hint ? (
+                      <Text as="p" variant="detail" color="secondary">
+                        {step.hint}
+                      </Text>
+                    ) : null}
+                  </Stack>
+                </Card>
+              ))}
+            </InstallGrid>
+          </Section>
+          <Section
+            id="theming"
+            title="Theming & preferences"
+            description="Preview density, contrast, and appearance controls to understand how tokens respond."
+          >
+            <ThemingGrid>
+              <ThemePlayground />
+              <Card padding="6" radius="lg" shadow="xs" border="subtle" background="surfaceSunken">
+                <Stack gap="4">
+                  <Stack gap="1">
+                    <Text as="span" variant="detail" color="secondary">
+                      Developer API
+                    </Text>
+                    <Text as="h3" variant="subtitle" weight="semibold">
+                      Access tokens in React
+                    </Text>
+                  </Stack>
+                  <Text as="p" variant="body" color="secondary">
+                    Use the <InlineCode>useApolloTheme</InlineCode> hook to read live design tokens and respond to user preferences across your product.
+                  </Text>
+                  <CodeBlock aria-label="Read tokens with useApolloTheme">
+{`const { theme, density, highContrast } = useApolloTheme();
+
+const accent = theme.colors.action.accent.solid;
+`}
+                  </CodeBlock>
+                  <Stack gap="2">
+                    {THEME_API_POINTS.map((point) => (
+                      <Text as="p" key={point.id} variant="detail" color="secondary">
+                        <InlineCode>{point.label}</InlineCode> — {point.description}
+                      </Text>
+                    ))}
+                  </Stack>
+                </Stack>
+              </Card>
+            </ThemingGrid>
+          </Section>
           <AtomsSection />
           <MoleculesSection />
           <OrganismsSection />
+          <Section
+            id="resources"
+            title="Resources"
+            description="Stay aligned with Apollo UI releases, tokens, and support channels."
+          >
+            <ResourceGrid>
+              {RESOURCE_ITEMS.map((item) => (
+                <Card
+                  key={item.id}
+                  padding="6"
+                  radius="lg"
+                  shadow="xs"
+                  border="subtle"
+                  background="surfaceRaised"
+                >
+                  <Stack gap="3">
+                    {item.badge ? (
+                      <Badge variant="subtle" tone="accent">
+                        {item.badge}
+                      </Badge>
+                    ) : null}
+                    <Text as="h3" variant="subtitle" weight="semibold">
+                      {item.title}
+                    </Text>
+                    <Text as="p" variant="body" color="secondary">
+                      {item.description}
+                    </Text>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      tone="neutral"
+                      as="a"
+                      href={item.href}
+                      target={item.target}
+                      rel={item.rel}
+                    >
+                      {item.actionLabel}
+                    </Button>
+                  </Stack>
+                </Card>
+              ))}
+            </ResourceGrid>
+          </Section>
           <Text as="p" variant="detail" color="secondary" align="center">
-            Built with ❤️ using Apollo UI primitives.
+            Crafted for product teams — built with ❤️ using Apollo UI primitives.
           </Text>
         </MainColumn>
       </Layout>

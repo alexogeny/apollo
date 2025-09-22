@@ -178,3 +178,24 @@ export type {
   CommandPaletteCommand,
   CommandPaletteTriggerProps,
 } from "./components/overlays/CommandPalette";
+
+export { Sidebar } from "./components/navigation/Sidebar";
+export type {
+  SidebarProps,
+  SidebarSection,
+  SidebarNavItem,
+  SidebarItemBadge,
+} from "./components/navigation/Sidebar";
+
+export { Dashboard } from "./components/organisms/Dashboard";
+export type {
+  DashboardProps,
+  DashboardMetric,
+  DashboardMetricTrend,
+  DashboardMetricProgress,
+  DashboardActivity,
+  DashboardAction,
+  DashboardFilter,
+  DashboardTableSection,
+  DashboardTrendTone,
+} from "./components/organisms/Dashboard";

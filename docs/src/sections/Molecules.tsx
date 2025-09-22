@@ -12,6 +12,7 @@ import {
   ContextMenuTrigger,
   DataTable,
   DatePicker,
+  Sidebar,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -48,6 +49,7 @@ import {
   useApolloTheme,
   useToast,
   type DataTableColumn,
+  type SidebarSection,
 } from "@apollo/ui";
 
 import { Section } from "../components/Section";
@@ -275,6 +277,88 @@ function CommandPaletteShowcase(): JSX.Element {
   );
 }
 
+function SidebarShowcase(): JSX.Element {
+  const sections = useMemo<ReadonlyArray<SidebarSection>>(
+    () => [
+      {
+        id: "workspace-nav",
+        title: "Workspace",
+        items: [
+          {
+            id: "overview",
+            label: "Overview",
+            description: "System health",
+            href: "#",
+          },
+          {
+            id: "components",
+            label: "Components",
+            description: "24 primitives",
+            href: "#",
+            badge: { label: "24", tone: "accent", variant: "subtle" },
+          },
+          {
+            id: "tokens",
+            label: "Tokens",
+            description: "Design tokens",
+            href: "#",
+          },
+          {
+            id: "accessibility",
+            label: "Accessibility",
+            description: "Audits & guidance",
+            disabled: true,
+          },
+        ],
+      },
+      {
+        id: "resources-nav",
+        title: "Resources",
+        items: [
+          {
+            id: "guidelines",
+            label: "Usage guidelines",
+            description: "Best practices",
+            href: "#",
+          },
+          {
+            id: "changelog",
+            label: "Changelog",
+            description: "Latest releases",
+            href: "#",
+          },
+        ],
+      },
+    ],
+    [],
+  );
+
+  return (
+    <div style={{ maxWidth: "280px" }}>
+      <Sidebar
+        sections={sections}
+        activeItemId="overview"
+        ariaLabel="Sidebar molecule showcase"
+        header={
+          <Stack gap="1">
+            <Text as="span" variant="detail" color="secondary">
+              Navigation
+            </Text>
+            <Text as="span" variant="bodySm" weight="semibold">
+              Design operations
+            </Text>
+          </Stack>
+        }
+        footer={
+          <Text as="span" variant="detail" color="secondary">
+            Consolidate documentation, patterns, and support links.
+          </Text>
+        }
+      />
+    </div>
+  );
+}
+
 export function MoleculesSection(): JSX.Element {
   const activeFilter = FILTERS[1];
 
@@ -360,6 +444,12 @@ export function MoleculesSection(): JSX.Element {
               </Box>
             ))}
           </Stack>
+        </ShowcaseCard>
+        <ShowcaseCard
+          title="Navigation sidebar"
+          description="Compose navigation hierarchies with badges, descriptions, and disabled states."
+        >
+          <SidebarShowcase />
         </ShowcaseCard>
         <ShowcaseCard
           title="Tag cloud"

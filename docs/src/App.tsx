@@ -1,13 +1,15 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 
 import {
-  Box,
+  Badge,
   Button,
   Card,
+  Sidebar,
   Stack,
   Text,
   type AppearanceOption,
+  type SidebarSection,
   useApolloTheme,
 } from "@apollo/ui";
 
@@ -54,56 +56,65 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-const NAVIGATION_LINKS = [
-  { id: "atoms", label: "Atoms" },
-  { id: "molecules", label: "Molecules" },
-  { id: "organisms", label: "Organisms" },
-] as const;
+const NAVIGATION_LINKS: ReadonlyArray<{
+  readonly id: string;
+  readonly label: string;
+  readonly description: string;
+  readonly badgeLabel?: string;
+}> = [
+  {
+    id: "atoms",
+    label: "Atoms",
+    description: "Foundational tokens and primitives",
+  },
+  {
+    id: "molecules",
+    label: "Molecules",
+    description: "Composable patterns and overlays",
+  },
+  {
+    id: "organisms",
+    label: "Organisms",
+    description: "Product-ready experience templates",
+    badgeLabel: "New",
+  },
+];
 
-const Navigation = styled.nav`
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: ${({ theme }) => theme.space["2"]};
-  padding: ${({ theme }) => `${theme.space["2"]} ${theme.space["2"]}`};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border.subtle};
-  background-color: ${({ theme }) => theme.colors.surface.surfaceRaised};
-  box-shadow: ${({ theme }) => theme.shadows.xs};
+const Layout = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.space["10"]};
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  align-items: start;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: ${({ theme }) => `${theme.space["10"]} ${theme.space["6"]}`};
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+    padding: ${({ theme }) => `${theme.space["8"]} ${theme.space["5"]}`};
+  }
 `;
 
-const NavigationLink = styled.a`
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: ${({ theme }) => `${theme.space["2"]} ${theme.space["3"]}`};
-  border-radius: ${({ theme }) => theme.radii.md};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.typography.variants.detail.fontSize};
-  line-height: ${({ theme }) => theme.typography.variants.detail.lineHeight};
-  letter-spacing: ${({ theme }) => theme.typography.variants.detail.letterSpacing};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  border: 1px solid transparent;
-  transition: ${({ theme }) =>
-    theme.motion.reduced
-      ? "none"
-      : [
-          `background-color ${theme.motion.duration.fast} ${theme.motion.easing.standard}`,
-          `color ${theme.motion.duration.fast} ${theme.motion.easing.standard}`,
-          `border-color ${theme.motion.duration.fast} ${theme.motion.easing.standard}`,
-        ].join(", ")};
-  &:hover {
-    color: ${({ theme }) => theme.colors.text.accent};
-    border-color: ${({ theme }) => theme.colors.border.subtle};
-    background-color: ${({ theme }) => theme.colors.surface.surfaceSunken};
+const SidebarPanel = styled.div`
+  position: sticky;
+  top: ${({ theme }) => theme.space["8"]};
+  align-self: start;
+  max-height: ${({ theme }) => `calc(100vh - (${theme.space["8"]} * 2))`};
+  width: 100%;
+  display: flex;
+
+  @media (max-width: 1024px) {
+    position: static;
+    max-height: none;
   }
-  &:focus-visible {
-    outline: none;
-    box-shadow:
-      ${({ theme }) => theme.shadows.xs},
-      0 0 0 4px ${({ theme }) => theme.colors.states.focusRing};
-  }
+`;
+
+const MainColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.space["12"]};
+  min-width: 0;
 `;
 
 interface ToggleOption<T extends string> {
@@ -245,27 +256,117 @@ function PreferencesPanel(): JSX.Element {
 }
 
 export function App(): JSX.Element {
+  const [activeSection, setActiveSection] = useState<string>(NAVIGATION_LINKS[0]?.id ?? "atoms");
+
+  const sidebarSections = useMemo<ReadonlyArray<SidebarSection>>(
+    () => [
+      {
+        id: "page-navigation",
+        title: "On this page",
+        items: NAVIGATION_LINKS.map((link) => ({
+          id: link.id,
+          label: link.label,
+          description: link.description,
+          href: `#${link.id}`,
+          badge: link.badgeLabel
+            ? { label: link.badgeLabel, tone: "accent", variant: "subtle" }
+            : undefined,
+        })),
+      },
+    ],
+    [],
+  );
+
+  const handleItemSelect = useCallback((sectionId: string) => {
+    setActiveSection(sectionId);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.IntersectionObserver) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.target.getBoundingClientRect().top - b.target.getBoundingClientRect().top);
+        if (visible[0]) {
+          const nextId = visible[0].target.id;
+          setActiveSection((prev) => (prev === nextId ? prev : nextId));
+        }
+      },
+      { rootMargin: "-40% 0px -40% 0px", threshold: 0.25 },
+    );
+
+    const elements = NAVIGATION_LINKS.map((link) => document.getElementById(link.id)).filter(
+      (element): element is HTMLElement => element !== null,
+    );
+    elements.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <GlobalStyles />
-      <Box as="main" paddingX="6" paddingY="12">
-        <Stack gap="12" style={{ maxWidth: "1040px", margin: "0 auto" }}>
+      <Layout>
+        <SidebarPanel>
+          <Sidebar
+            sections={sidebarSections}
+            activeItemId={activeSection}
+            onItemSelect={handleItemSelect}
+            ariaLabel="Documentation navigation"
+            header={
+              <Stack gap="2">
+                <Text as="span" variant="subtitle" weight="semibold">
+                  Apollo UI
+                </Text>
+                <Stack direction="horizontal" gap="2" align="center">
+                  <Badge variant="subtle" tone="accent">
+                    v0.3 preview
+                  </Badge>
+                  <Text as="span" variant="detail" color="secondary">
+                    Design system
+                  </Text>
+                </Stack>
+                <Text as="p" variant="detail" color="secondary">
+                  Navigate foundational atoms, expressive molecules, and opinionated organisms.
+                </Text>
+              </Stack>
+            }
+            footer={
+              <Stack gap="2">
+                <Text as="span" variant="detail" color="secondary">
+                  Need a hand? Join the #apollo-ui channel or reach out at
+                </Text>
+                <Text as="a" href="mailto:design@apollo.dev" variant="detail" color="accent">
+                  design@apollo.dev
+                </Text>
+              </Stack>
+            }
+          />
+        </SidebarPanel>
+        <MainColumn>
           <Stack as="header" gap="6">
-            <Stack gap="2">
-              <Text as="h1" variant="headline" weight="semibold" wrap="balance">
-                Apollo UI design system documentation
-              </Text>
-              <Text as="p" variant="body" color="secondary">
-                Explore the foundational atoms, composite molecules, and opinionated organisms built with Apollo UI primitives.
-              </Text>
+            <Stack gap="3">
+              <Stack direction="horizontal" gap="2" align="center">
+                <Badge variant="subtle" tone="accent">
+                  Update
+                </Badge>
+                <Text as="span" variant="detail" color="secondary">
+                  Sidebar molecule and dashboard organism just landed.
+                </Text>
+              </Stack>
+              <Stack gap="2">
+                <Text as="h1" variant="headline" weight="semibold" wrap="balance">
+                  Apollo UI design system documentation
+                </Text>
+                <Text as="p" variant="body" color="secondary">
+                  Explore the foundational atoms, composite molecules, and production-ready organisms built with Apollo UI primitives.
+                </Text>
+              </Stack>
             </Stack>
-            <Navigation aria-label="Section navigation">
-              {NAVIGATION_LINKS.map((link) => (
-                <NavigationLink key={link.id} href={`#${link.id}`}>
-                  {link.label}
-                </NavigationLink>
-              ))}
-            </Navigation>
             <PreferencesPanel />
           </Stack>
           <AtomsSection />
@@ -274,8 +375,8 @@ export function App(): JSX.Element {
           <Text as="p" variant="detail" color="secondary" align="center">
             Built with ❤️ using Apollo UI primitives.
           </Text>
-        </Stack>
-      </Box>
+        </MainColumn>
+      </Layout>
     </>
   );
 }

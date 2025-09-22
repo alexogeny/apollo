@@ -17,6 +17,7 @@ import {
 
 import { Section } from "../components/Section";
 import { ShowcaseCard } from "../components/ShowcaseCard";
+import { ShowcaseGrid } from "../components/ShowcaseGrid";
 
 interface SurfaceExample {
   readonly token: "surface" | "surfaceRaised" | "surfaceContrast";
@@ -43,7 +44,7 @@ export function AtomsSection(): JSX.Element {
       title="Atoms"
       description="Foundational primitives that wrap low-level HTML semantics with Apollo's design tokens."
     >
-      <Stack direction="horizontal" gap="6" wrap>
+      <ShowcaseGrid>
         <ShowcaseCard
           title="Box"
           description="Layout primitive exposing consistent spacing, radius, borders, and surface colors."
@@ -217,7 +218,7 @@ export function AtomsSection(): JSX.Element {
             </Stack>
           </Stack>
         </ShowcaseCard>
-      </Stack>
+      </ShowcaseGrid>
     </Section>
   );
 }

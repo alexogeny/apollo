@@ -52,6 +52,7 @@ import {
 
 import { Section } from "../components/Section";
 import { ShowcaseCard } from "../components/ShowcaseCard";
+import { ShowcaseGrid } from "../components/ShowcaseGrid";
 
 const FILTERS = ["Overview", "Components", "Tokens", "Accessibility"] as const;
 
@@ -304,7 +305,7 @@ export function MoleculesSection(): JSX.Element {
       title="Molecules"
       description="Composable assemblies of atoms that capture reusable interface patterns."
     >
-      <Stack direction="horizontal" gap="6" wrap>
+      <ShowcaseGrid>
         <ShowcaseCard
           title="Filter toolbar"
           description="Buttons compose into toggle groups with clear selection and keyboard focus handling."
@@ -410,7 +411,7 @@ export function MoleculesSection(): JSX.Element {
             </Stack>
           </ToastProvider>
         </ShowcaseCard>
-      </Stack>
+      </ShowcaseGrid>
     </Section>
   );
 }

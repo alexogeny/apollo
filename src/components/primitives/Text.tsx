@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  type AnchorHTMLAttributes,
   type ElementType,
   type HTMLAttributes,
   type Ref,
@@ -26,7 +27,11 @@ interface StyledTextProps {
 
 export interface TextProps
   extends Omit<BoxProps, "color" | "wrap">,
-    Omit<HTMLAttributes<HTMLElement>, "color"> {
+    Omit<HTMLAttributes<HTMLElement>, "color">,
+    Pick<
+      AnchorHTMLAttributes<HTMLAnchorElement>,
+      "href" | "hrefLang" | "target" | "rel" | "download" | "ping" | "referrerPolicy" | "type"
+    > {
   readonly as?: ElementType;
   readonly variant?: TextVariant;
   readonly weight?: FontWeightToken;

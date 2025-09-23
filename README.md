@@ -1,16 +1,18 @@
 # Apollo UI
 
-Apollo UI is a type-safe React design system foundation built with Bun, inspired by the polish of [shadcn/ui](https://ui.shadcn.com/). It combines rich design tokens, an adaptive theme provider, and accessible primitives for quickly assembling product-quality interfaces.
+Apollo UI is a React component system tailored for modern dashboard experiences. It embraces the [shadcn/ui manual installation approach](https://ui.shadcn.com/docs/installation/manual) to deliver a set of polished molecules and organisms backed by accessible primitives, WCAG-compliant color palettes, and reduced-motion awareness.
 
-## Features
+## Highlights
 
-- **Design tokens** for color, spacing, typography, motion, and state semantics.
-- **Adaptive theming** with light/dark modes, high-contrast support, density scaling, and reduced-motion awareness.
-- **Composable primitives** (`Box`, `Text`, `Button`, `Card`, `Stack`) powered by `styled-components`.
-- **Strict TypeScript** APIs with zero `any`s and ergonomic defaults for frontend engineers.
-- **Bun-native tooling** for rapid iteration with `bun test` and `bun run typecheck`.
+- **Adaptive theming** — light/dark switching, high-contrast tones, and motion preferences powered by a lightweight theme provider.
+- **Accessible molecules** — metric cards, filter toolbars, insight lists, and activity timelines that communicate trend direction, sparklines, and statuses in screen-reader friendly ways.
+- **Dashboard-ready organisms** — opinionated layouts such as the revenue overview composed with Radix primitives and utility-first styling.
+- **Tailwind-first styling** — components ship with ready-to-use class names; import the shared stylesheet once to unlock the full design token set.
+- **Bun-native toolchain** — testing, type-checking, and documentation all run via Bun for fast feedback loops.
 
 ## Getting started
+
+Install dependencies and run the automated checks:
 
 ```bash
 bun install
@@ -20,54 +22,70 @@ bun test --coverage
 
 ## Usage
 
-Wrap your application with `ApolloThemeProvider` to expose the theme context, then compose primitives to build surfaces.
+Import the design tokens by including the stylesheet once in your application entry, then wrap your tree with the `ThemeProvider` to honour system preferences and runtime toggles.
 
 ```tsx
+import "@apollo/ui/styles/tailwind.css";
+
 import {
-  ApolloThemeProvider,
-  Button,
-  Card,
-  Stack,
-  Text,
+  ActivityTimeline,
+  AnalyticsOverview,
+  DashboardHeader,
+  FilterToolbar,
+  ThemeProvider,
 } from "@apollo/ui";
 
-export function Example(): JSX.Element {
+export function App(): JSX.Element {
   return (
-    <ApolloThemeProvider>
-      <Card padding="8" shadow="md" radius="xl" tone="accent">
-        <Stack gap="4">
-          <Text variant="headline">Welcome aboard</Text>
-          <Text variant="body" color="muted">
-            Build accessible experiences with Apollo UI primitives.
-          </Text>
-          <Button size="lg" tone="accent">
-            Get started
-          </Button>
-        </Stack>
-      </Card>
-    </ApolloThemeProvider>
+    <ThemeProvider>
+      <div className="space-y-8">
+        <DashboardHeader
+          title="Revenue performance hub"
+          description="Bring revenue, adoption, and engagement into one dashboard."
+        />
+        <FilterToolbar filters={[{ label: "Enterprise", value: "enterprise", active: true }]} />
+        <AnalyticsOverview
+          metrics={[]}
+          timeline={{ events: [], title: "Activity" }}
+        />
+        <ActivityTimeline
+          title="Key handoffs"
+          events={[
+            { id: "1", title: "Review", description: "Design review shipped", timestamp: "Today" },
+          ]}
+        />
+      </div>
+    </ThemeProvider>
   );
 }
 ```
 
-### Theming controls
+Every component ships with strict TypeScript types—hover tooltips surface the required props and sensible defaults.
 
-`ApolloThemeProvider` accepts `appearance`, `density`, and `highContrast` props (or corresponding change callbacks) to drive UI preferences. Consumers can also call `useApolloTheme()` to toggle modes at runtime.
+### Theme provider controls
 
-Design tokens can be accessed directly via `createTheme`, `lightTheme`, and `darkTheme`, or by reading `theme` from the provider context.
+The `ThemeProvider` exposes `setSchemePreference`, `setHighContrastPreference`, and `setMotionPreference` for runtime adjustments. These preferences update `document.documentElement` attributes so Tailwind utilities and custom styles can react without extra configuration.
 
 ## Documentation
 
-A documentation site built with Vite showcases Apollo UI atoms, molecules, and organisms. Run it locally with:
+The `docs` package contains a Vite-powered preview of the molecules and organisms. Start it locally with:
 
 ```bash
 bun run docs:dev
 ```
 
-Deployments are automated via GitHub Pages from the `Deploy documentation` workflow. Each build publishes the static site to the repository's Pages environment using the latest `main` branch.
+A GitHub Action named **Deploy documentation** builds `docs/dist` with Bun and publishes it to GitHub Pages on every push to `main`.
 
 ## Testing
 
-All primitives ship with Bun-powered tests to verify rendering, theming, and accessibility behaviours. Run the suite with coverage enabled via `bun test --coverage`.
+Bun drives the test suite through `@testing-library/react`, ensuring theming hooks and dashboard patterns remain accessible. Run the full suite with:
 
-Continuous integration is powered by GitHub Actions; the `CI` workflow runs `bun run typecheck`, the full test suite, and ensures the documentation bundle compiles on every push and pull request targeting `main`.
+```bash
+bun test --coverage
+```
+
+Type checking uses the shared project configuration. Run it manually via:
+
+```bash
+bun run typecheck
+```

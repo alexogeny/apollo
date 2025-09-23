@@ -1,7 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { ApolloThemeProvider } from "@apollo/ui";
+import { ThemeProvider } from "@apollo/ui";
+
+import "../../src/styles/tailwind.css";
+import "./app.css";
 
 import { App } from "./App";
 
@@ -13,8 +16,8 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <ApolloThemeProvider>
+    <ThemeProvider>
       <App />
-    </ApolloThemeProvider>
+    </ThemeProvider>
   </StrictMode>,
 );

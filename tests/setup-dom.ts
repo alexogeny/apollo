@@ -1,48 +1,15 @@
-import GlobalWindow from "happy-dom/lib/window/GlobalWindow.js";
+import { Window } from "happy-dom";
 
-const windowInstance = new GlobalWindow();
-windowInstance.happyDOM.setURL("http://localhost");
+const windowInstance = new Window();
+const globalObject = globalThis as unknown as Record<string, unknown>;
 
-Object.assign(globalThis, {
-  window: windowInstance,
-  document: windowInstance.document,
-  navigator: windowInstance.navigator,
-  HTMLElement: windowInstance.HTMLElement,
-  HTMLDivElement: windowInstance.HTMLDivElement,
-  HTMLButtonElement: windowInstance.HTMLButtonElement,
-  SVGElement: windowInstance.SVGElement,
-  CustomEvent: windowInstance.CustomEvent,
-  Event: windowInstance.Event,
-  Node: windowInstance.Node,
-  Element: windowInstance.Element,
-  MutationObserver: windowInstance.MutationObserver,
-  ResizeObserver: windowInstance.ResizeObserver,
-  getComputedStyle: windowInstance.getComputedStyle.bind(windowInstance),
-  requestAnimationFrame: windowInstance.requestAnimationFrame.bind(windowInstance),
-  cancelAnimationFrame: windowInstance.cancelAnimationFrame.bind(windowInstance),
-  customElements: windowInstance.customElements,
-});
+globalObject.window = windowInstance as unknown;
+globalObject.document = windowInstance.document;
+globalObject.HTMLElement = windowInstance.HTMLElement;
+globalObject.Node = windowInstance.Node;
+globalObject.navigator = windowInstance.navigator;
 
-if (!windowInstance.document.body) {
-  const body = windowInstance.document.createElement("body");
-  windowInstance.document.documentElement.appendChild(body);
-}
+globalObject.requestAnimationFrame = (() => 0) as unknown;
+globalObject.cancelAnimationFrame = (() => undefined) as unknown;
 
-if (!window.matchMedia) {
-  Object.defineProperty(window, "matchMedia", {
-    writable: true,
-    value: (query: string) => {
-      const mediaQueryList: MediaQueryList = {
-        media: query,
-        matches: false,
-        onchange: null,
-        addEventListener: () => undefined,
-        removeEventListener: () => undefined,
-        addListener: () => undefined,
-        removeListener: () => undefined,
-        dispatchEvent: () => false,
-      };
-      return mediaQueryList;
-    },
-  });
-}
+process.env.TZ = "UTC";

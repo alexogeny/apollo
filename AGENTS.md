@@ -1,86 +1,125 @@
-# Mission (Single Sentence)
+# AGENTS.md — FruitUI (Radix-powered, Bun toolchain)
 
-Design and implement a pure React + TypeScript UI framework inspired by shadcn/ui’s visual language, but with no Tailwind or styled-components, featuring a tiny in-house styled-componentry helper, fully tokenized CSS variables, built-in themes (system/light/dark), high-contrast, reduced motion, color-blind safe palettes, and a layered atoms → molecules → organisms component architecture.
+> Build a composable **React+TypeScript** UI system using **Radix UI** for behavior and our own **token-driven styling** (no Tailwind/SC). Keep Radix’s clean feel but add **character** via fruit-themed palettes, gentle radii, soft shadows, and tactile focus.
 
-## Success Criteria (What “Good” Looks Like)
+---
 
-Ergonomics: Type-safe props, minimal surface area, easy composition; zero “god props”.
+## Mission
 
-Visual parity: Feels like shadcn/ui’s aesthetic (spacing, radii, shadows), without copying code or requiring Tailwind.
+Ship **FruitUI**: tokens → atoms → molecules → organisms. **Pure TS/React**, **Radix primitives**, **CSS variables** + a tiny `styled()` helper. First‑class themes: system/light/dark, High Contrast, Reduced Motion, color‑blind safe.
 
-Design tokens: 100% of color/space/typography/shadow/radius/z-index/motion defined as CSS variables with TypeScript types for intellisense.
+## Non-goals
 
-Theming: Works out-of-the-box with system/light/dark + High Contrast (forced-colors) + Reduced Motion + color-blind safe palettes.
+No design tool sync, no CSS-in-JS libs, no heavy theming runtime.
 
-Accessibility: Conforms to WCAG 2.2 AA; proper roles/labels/tab order/focus states; passes automated checks.
+---
 
-Zero/near-zero deps: Only React + (optional) tiny utilities for testing/build; no Tailwind, no styled-components.
+## Tooling (Bun-first)
 
-Documentation & Examples: Clear docs, live Storybook-like examples, usage recipes, and theming guides.
+* **Runtime/Dev**: `bun` for install, scripts, test, bundling (`bun build`).
+* **Lint/Format**: Add **ESLint** + **Prettier** (if Bun doesn’t provide). Strict TS.
+* **Test**: `bun test` + Testing Library.
+* **Scripts** (package.json):
 
-Testing & CI: Unit/visual/a11y tests; PR checks block regressions.
+  * `dev`: `bun run playground` (local docs app)
+  * `build`: `bun build ./packages/fruitui/src/index.ts --outdir dist --target browser`
+  * `lint`: `bunx eslint .`
+  * `format`: `bunx prettier . --write`
+  * `test`: `bun test`
 
-## Constraints / Ground Rules
+---
 
-Language/Runtime: TypeScript, React 18+; DOM web only (no RN).
+## Packages & Layout
 
-Dependencies: React (required). Optional: @testing-library/react, vitest/jest, tsup/rollup. Avoid runtime deps beyond these.
+```
+/packages/fruitui
+  /src
+    /foundations   # tokens, themes, modes, motions
+    /styled        # createStyled(), cx()
+    /atoms         # Button, Text, Input, Checkbox, Radio, Switch, Badge, Card
+    /molecules     # Dialog*, Tooltip*, Popover*, Tabs*, Accordion*, Toast*
+    /organisms     # ToastViewport, ModalStack
+    index.ts
+/docs (mdx)  /playground (bun dev)
+```
 
-Styling approach: CSS variables + a tiny styled() helper (in-house) that:
+\* built on **Radix UI** primitives.
 
-Merges classNames and style objects.
+---
 
-Applies variant maps → class/inline styles.
+## Visual Identity (give Radix character)
 
-Emits data-attributes for states (e.g., data-state="open").
+* **Fruit palettes** with subtle warmth: Apple, Blueberry, Lime, Papaya, Plum, Dragonfruit.
+* **Signature touches** (tokenized):
 
-Zero runtime theme re-computation; themes via :root vars + scopes.
+  * Radius: `md` default, `xl` for interactive surfaces.
+  * Shadows: low-elevation “velvet” shadow + crisp **focus ring**.
+  * Motion: tiny spring‑like scale on press (disabled under PRM).
+  * States: color + icon/shape (works for color blindness).
 
-File structure: strict atoms/, molecules/, organisms/, foundations/; no cross-layer imports upward.
+---
 
-Accessibility: Build with semantic elements first; ARIA only when necessary; keyboard and screen reader parity required.
+## Tokens (typed + CSS vars)
 
-Performance: No layout thrash; avoid re-renders; motion honors prefers-reduced-motion.
+Categories: `color`, `space`, `radius`, `shadow`, `typography`, `motion`, `z`.
+Scopes:
 
-Licensing: MIT; attribute visual inspiration to shadcn/ui in README.
+* `:root` (system) + `[data-theme="light|dark"]`
+* `[data-palette]` for fruit ramps `--fruit-accent-50..900`
+* HC: `@media (forced-colors: active)`
+* PRM: `@media (prefers-reduced-motion: reduce)`
+  Components **never hardcode** values; read from vars only.
 
-## Information & Inspirations (Do Not Copy Code)
+---
 
-Visual tone: shadcn/ui (rounded, subtle shadows, soft radii, tasteful contrast).
+## Styled Helper (rudimentary)
 
-Component coverage v1: Button, IconButton, Text, Heading, Input, Textarea, Select, Checkbox, Radio, Switch, Badge, Tag/Chip, Tooltip, Popover, Dialog/Modal, Toast, Card, Tabs, Accordion.
+`styled(tag, { base, variants, compoundVariants, defaultVariants })` → returns typed component; maps variant props → classNames. Emits `data-*` state hooks. Zero theme math at runtime.
 
-## Deliverables
+---
 
-Package @apollo/core with:
-- foundations/ tokens & themes
-- styled/ helper
-- atoms/, molecules/, organisms/
-- themes/ fruit palettes
-- a11y/ utilities
+## Components
 
-Documentation site with live examples.
+**Atoms**: Button, IconButton, Text, Heading, Input, Textarea, Select (headless+style), Checkbox, Radio, Switch, Badge/Tag, Card.
+**Molecules (Radix)**: Dialog, Tooltip, Popover, Tabs, Accordion, Toast.
+**Organisms**: ToastViewport, ModalStack.
 
-Test suite (unit + a11y + basic visual snapshots).
+Authoring rules: semantic HTML first; accessible by default; props `variant|tone|size`; no “god props”.
 
-CI config (typecheck, lint, test, size-limit).
+---
 
-Playground app showing theme switching, HC mode, reduced motion.
+## Execution Steps (agent)
 
-Design Token reference (MDX): maps & rationale.
+1. **Scaffold** repo (bun workspaces). Init TS strict, ESLint, Prettier.
+2. **Foundations**: write `tokens.ts` + base `css-vars.css`; fruit palettes with contrast checks.
+3. **Helper**: implement `cx()` + `createStyled()`; unit tests for variant typing.
+4. **Atoms**: implement Button + tests as pattern baseline; then remaining atoms.
+5. **Molecules**: wrap Radix primitives; add focus return, ARIA wiring.
+6. **Docs**: MDX examples with theme/palette toggles, HC/PRM demos.
+7. **QA**: axe, keyboard sweeps, contrast gate in CI; bundle size budget.
+8. **Release** `0.1.0` via Bun scripts; MIT license; note shadcn/radix inspiration.
 
-## Fruit-Themed Palettes (Color-blind Safe Emphasis)
+---
 
-Provide multiple palettes, each a set of HSL ramps with accessible contrasts:
+## Acceptance Criteria
 
-Apple (neutral + red accent)
+* System/light/dark + HC + PRM verified.
+* ≥3 fruit palettes pass contrast; states have non‑color affordances.
+* Atoms+molecules ship with types, docs, tests; small bundle.
+* Examples show composition **atoms → molecules → organisms**.
 
-Blueberry (cool blues)
+---
 
-Lime (greens/teals)
+## Usage (consumer)
 
-Papaya (warm orange)
+```tsx
+<html data-theme="dark" data-palette="plum"/>
+import { Button, Dialog } from "@fruitui/core";
+<Button tone="accent" size="lg">Continue</Button>
+<Dialog.Root>
+  <Dialog.Trigger asChild><Button variant="outline">Open</Button></Dialog.Trigger>
+  <Dialog.Content>{/* styled via tokens */}</Dialog.Content>
+</Dialog.Root>
+```
 
-Plum (violet/purple)
-
-Dragonfruit (magenta accent)
+**North star**: Radix reliability, **FruitUI personality**—friendly radii, cozy shadows, vibrant fruit accents, disciplined tokens.

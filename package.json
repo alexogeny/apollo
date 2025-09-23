@@ -15,7 +15,8 @@
     "lint": "bunx eslint .",
     "format": "bunx prettier . --write",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docs:build": "bun docs/build.tsx"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

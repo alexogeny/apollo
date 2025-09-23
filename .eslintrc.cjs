@@ -26,6 +26,7 @@ module.exports = {
     'import/resolver': {
       typescript: true,
     },
+    'import/core-modules': ['bun:test'],
   },
   ignorePatterns: ['dist', 'node_modules', 'bun.lock'],
   rules: {

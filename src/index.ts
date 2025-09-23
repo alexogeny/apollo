@@ -1,201 +1,81 @@
-export {
-  ApolloThemeProvider,
-  useApolloTheme,
-} from "./theme/provider";
+export { ThemeProvider, useTheme } from "./providers/theme-provider";
 export type {
-  ApolloThemeProviderProps,
-  ApolloThemeContextValue,
-  AppearanceOption,
-} from "./theme/provider";
+  ColorSchemePreference,
+  ContrastPreference,
+  MotionPreference,
+} from "./providers/theme-provider";
 
-export {
-  createTheme,
-  lightTheme,
-  darkTheme,
-  tokens,
-} from "./theme/tokens";
-export type {
-  ActionTone,
-  Appearance,
-  ApolloTheme,
-  Contrast,
-  Density,
-  ThemeColorTokens,
-  ThemeOverride,
-  ThemeSpace,
-  TextVariant,
-  FontWeightToken,
-  SurfaceColorToken,
-  TextColorToken,
-  ShadowToken,
-  RadiusToken,
-  SpacingScale,
-} from "./theme/tokens";
+export { cn } from "./lib/utils";
 
-export { Box } from "./components/primitives/Box";
-export type { BoxProps } from "./components/primitives/Box";
+export { Button, buttonVariants } from "./components/ui/button";
+export type { ButtonProps } from "./components/ui/button";
 
-export { Text } from "./components/primitives/Text";
-export type { TextProps, TextAlign, TextWrap } from "./components/primitives/Text";
+export { Badge } from "./components/ui/badge";
+export type { BadgeProps } from "./components/ui/badge";
 
-export { Button } from "./components/primitives/Button";
-export type { ButtonProps, ButtonVariant, ButtonSize } from "./components/primitives/Button";
+export { Card } from "./components/ui/card";
+export type { CardProps } from "./components/ui/card";
 
-export { Card } from "./components/primitives/Card";
-export type { CardProps } from "./components/primitives/Card";
+export { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
 
-export { Stack } from "./components/layout/Stack";
-export type { StackProps, StackDirection } from "./components/layout/Stack";
+export { Input } from "./components/ui/input";
+export type { InputProps } from "./components/ui/input";
 
-export { Checkbox } from "./components/primitives/Checkbox";
-export type { CheckboxProps } from "./components/primitives/Checkbox";
+export { Label } from "./components/ui/label";
+export type { LabelProps } from "./components/ui/label";
 
-export { RadioGroup, RadioGroupItem } from "./components/primitives/RadioGroup";
-export type { RadioGroupProps, RadioGroupItemProps } from "./components/primitives/RadioGroup";
+export { Progress } from "./components/ui/progress";
+export type { ProgressProps } from "./components/ui/progress";
 
-export { Switch } from "./components/primitives/Switch";
-export type { SwitchProps } from "./components/primitives/Switch";
+export { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs";
 
-export { Skeleton } from "./components/primitives/Skeleton";
-export type { SkeletonProps } from "./components/primitives/Skeleton";
-
-export { Avatar } from "./components/primitives/Avatar";
-export type { AvatarProps, AvatarSize, AvatarStatus } from "./components/primitives/Avatar";
-
-export { Badge } from "./components/primitives/Badge";
-export type { BadgeProps, BadgeVariant } from "./components/primitives/Badge";
-
-export { Progress } from "./components/primitives/Progress";
-export type { ProgressProps, ProgressVariant } from "./components/primitives/Progress";
-
-export { Spinner } from "./components/primitives/Spinner";
-export type { SpinnerProps, SpinnerSize } from "./components/primitives/Spinner";
-
-export { ToastProvider, useToast } from "./components/feedback/Toast";
-export type {
-  ToastProviderProps,
-  ToastPlacement,
-  ToastOptions,
-  ToastAction,
-} from "./components/feedback/Toast";
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./components/ui/tooltip";
 
 export {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-} from "./components/overlays/Dialog";
-export type {
-  DialogProps,
-  DialogTriggerProps,
-  DialogContentProps,
-  DialogHeaderProps,
-  DialogFooterProps,
-  DialogTitleProps,
-  DialogDescriptionProps,
-  DialogCloseProps,
-} from "./components/overlays/Dialog";
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuGroup,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuPortal,
+} from "./components/ui/dropdown-menu";
+
+export { Separator } from "./components/ui/separator";
+export { Table, TableBody, TableCell, TableCaption, TableHead, TableHeader, TableRow, TableFooter } from "./components/ui/table";
+export { Skeleton } from "./components/ui/skeleton";
 
 export {
-  Modal,
-  ModalTrigger,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalTitle,
-  ModalDescription,
-  ModalClose,
-} from "./components/overlays/Modal";
+  MetricCard,
+  type MetricCardProps,
+  type MetricTrend,
+  type MetricTrendDirection,
+  type MetricProgress,
+  type MetricSparkline,
+} from "./components/molecules/metric-card";
+
+export { FilterToolbar, type FilterToolbarProps, type FilterSegment } from "./components/molecules/filter-toolbar";
+
+export { InsightList, type InsightListProps, type InsightItem, type InsightStatus } from "./components/molecules/insight-list";
 
 export {
-  Sheet,
-  SheetTrigger,
-  SheetHeader,
-  SheetFooter,
-  SheetTitle,
-  SheetDescription,
-  SheetClose,
-  SheetContent,
-} from "./components/overlays/Sheet";
-export type { SheetContentProps } from "./components/overlays/Sheet";
+  ActivityTimeline,
+  type ActivityTimelineProps,
+  type TimelineEvent,
+} from "./components/molecules/activity-timeline";
+
+export { DashboardHeader, type DashboardHeaderProps, type DashboardBreadcrumb, type DashboardAction } from "./components/organisms/dashboard-header";
 
 export {
-  Dropdown,
-  DropdownTrigger,
-  DropdownContent,
-  DropdownItem,
-  DropdownSeparator,
-} from "./components/overlays/Dropdown";
-export type {
-  DropdownProps,
-  DropdownTriggerProps,
-  DropdownContentProps,
-  DropdownItemProps,
-  DropdownSeparatorProps,
-} from "./components/overlays/Dropdown";
-
-export { Tooltip, TooltipTrigger, TooltipContent } from "./components/overlays/Tooltip";
-export type { TooltipProps, TooltipTriggerProps, TooltipContentProps, TooltipSide } from "./components/overlays/Tooltip";
-
-export {
-  ContextMenu,
-  ContextMenuTrigger,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-} from "./components/overlays/ContextMenu";
-export type {
-  ContextMenuProps,
-  ContextMenuTriggerProps,
-  ContextMenuContentProps,
-  ContextMenuItemProps,
-  ContextMenuSeparatorProps,
-} from "./components/overlays/ContextMenu";
-
-export { DataTable } from "./components/data/DataTable";
-export type {
-  DataTableProps,
-  DataTableColumn,
-  DataTableSortState,
-  SortDirection,
-  DataTableAlign,
-} from "./components/data/DataTable";
-
-export { DatePicker } from "./components/forms/DatePicker";
-export type { DatePickerProps } from "./components/forms/DatePicker";
-
-export {
-  CommandPalette,
-  CommandPaletteTrigger,
-  useCommandPalette,
-} from "./components/overlays/CommandPalette";
-export type {
-  CommandPaletteProps,
-  CommandPaletteCommand,
-  CommandPaletteTriggerProps,
-} from "./components/overlays/CommandPalette";
-
-export { Sidebar } from "./components/navigation/Sidebar";
-export type {
-  SidebarProps,
-  SidebarSection,
-  SidebarNavItem,
-  SidebarItemBadge,
-} from "./components/navigation/Sidebar";
-
-export { Dashboard } from "./components/organisms/Dashboard";
-export type {
-  DashboardProps,
-  DashboardMetric,
-  DashboardMetricTrend,
-  DashboardMetricProgress,
-  DashboardActivity,
-  DashboardAction,
-  DashboardFilter,
-  DashboardTableSection,
-  DashboardTrendTone,
-} from "./components/organisms/Dashboard";
+  AnalyticsOverview,
+  type AnalyticsOverviewProps,
+  type OverviewTableRow,
+} from "./components/organisms/analytics-overview";

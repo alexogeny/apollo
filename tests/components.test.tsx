@@ -1,133 +1,108 @@
 import "./setup-dom";
+
 import { afterEach, describe, expect, it } from "bun:test";
-import { cleanup, fireEvent, render } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react";
 
 import {
-  ApolloThemeProvider,
+  ActivityTimeline,
+  Badge,
   Button,
-  Card,
-  Stack,
-  Text,
-  useApolloTheme,
-  Box,
+  FilterToolbar,
+  MetricCard,
+  ThemeProvider,
 } from "../src";
 
 afterEach(() => cleanup());
 
-describe("ApolloThemeProvider", () => {
-  it("exposes appearance toggles via context", () => {
-    function ThemeToggle(): JSX.Element {
-      const { appearance, setAppearance } = useApolloTheme();
-      return (
-        <button
-          type="button"
-          data-testid="appearance-toggle"
-          onClick={() => setAppearance(appearance === "light" ? "dark" : "light")}
-        >
-          {appearance}
-        </button>
-      );
-    }
-
-    const { getByTestId } = render(
-      <ApolloThemeProvider>
-        <ThemeToggle />
-      </ApolloThemeProvider>,
-    );
-
-    const toggle = getByTestId("appearance-toggle");
-    expect(toggle.textContent).toBe("light");
-    fireEvent.click(toggle);
-    expect(toggle.textContent).toBe("dark");
-  });
-});
-
-describe("Button", () => {
-  it("renders with accessible defaults", () => {
+describe("UI components", () => {
+  it("renders buttons with variant data attributes and default type", () => {
     const { getByRole } = render(
-      <ApolloThemeProvider>
-        <Button>Confirm</Button>
-      </ApolloThemeProvider>,
+      <ThemeProvider>
+        <Button variant="secondary">Download</Button>
+      </ThemeProvider>,
     );
 
-    const button = getByRole("button", { name: "Confirm" });
+    const button = getByRole("button", { name: "Download" });
     expect(button.getAttribute("type")).toBe("button");
-    expect(button.dataset.variant).toBe("solid");
-    expect(button.dataset.tone).toBe("accent");
+    expect(button.dataset.variant).toBe("secondary");
   });
 
-  it("honors tone and variant props", () => {
-    const { getByRole } = render(
-      <ApolloThemeProvider>
-        <Button variant="outline" tone="danger">
-          Delete
-        </Button>
-      </ApolloThemeProvider>,
-    );
-
-    const button = getByRole("button", { name: "Delete" });
-    expect(button.dataset.variant).toBe("outline");
-    expect(button.dataset.tone).toBe("danger");
-  });
-});
-
-describe("Text", () => {
-  it("respects semantic elements and variants", () => {
+  it("supports badge variants", () => {
     const { getByText } = render(
-      <ApolloThemeProvider>
-        <Text as="label" htmlFor="field" variant="detail">
-          Label
-        </Text>
-      </ApolloThemeProvider>,
+      <ThemeProvider>
+        <Badge variant="success">Healthy</Badge>
+      </ThemeProvider>,
     );
 
-    const label = getByText("Label");
-    expect(label.tagName).toBe("LABEL");
-    expect(label.getAttribute("for")).toBe("field");
+    const badge = getByText("Healthy");
+    expect(badge.dataset.variant).toBe("success");
+    expect(badge.className).toContain("bg-chart-3/20");
   });
 });
 
-describe("Card", () => {
-  it("adds keyboard affordances when interactive", () => {
-    const { getByTestId } = render(
-      <ApolloThemeProvider>
-        <Card interactive data-testid="card">
-          Content
-        </Card>
-      </ApolloThemeProvider>,
+describe("Molecules", () => {
+  it("annotates metric cards with sparkline labels", () => {
+    const { getByRole, getByText } = render(
+      <ThemeProvider>
+        <MetricCard
+          title="Pipeline coverage"
+          value="$3.2M"
+          trend={{ label: "vs goal", direction: "increase", delta: 3.4, tone: "success" }}
+          sparkline={{ points: [1, 2, 3], label: "Coverage trend", tone: "accent" }}
+          progress={{ value: 68, label: "Quarter goal", tone: "accent" }}
+        />
+      </ThemeProvider>,
     );
 
-    const card = getByTestId("card");
-    expect(card.getAttribute("tabindex")).toBe("0");
-    expect(card.getAttribute("role")).toBe("button");
+    expect(getByText("Pipeline coverage")).toBeTruthy();
+    const sparkline = getByRole("img", { name: "Coverage trend" });
+    expect(sparkline.tagName.toLowerCase()).toBe("svg");
+  });
+
+  it("renders activity timeline events with accessible ordering", () => {
+    const { getAllByRole } = render(
+      <ThemeProvider>
+        <ActivityTimeline
+          title="Workflow"
+          events={[
+            {
+              id: "1",
+              title: "Review",
+              description: "Review session scheduled",
+              timestamp: "2024-04-01",
+              tone: "accent",
+            },
+            {
+              id: "2",
+              title: "Ship",
+              description: "Release deployed",
+              timestamp: "2024-04-02",
+              tone: "success",
+            },
+          ]}
+        />
+      </ThemeProvider>,
+    );
+
+    const items = getAllByRole("listitem");
+    expect(items).toHaveLength(2);
   });
 });
 
-describe("Stack", () => {
-  it("lays out children horizontally when requested", () => {
-    const { getByTestId } = render(
-      <ApolloThemeProvider>
-        <Stack direction="horizontal" data-testid="stack">
-          <span>One</span>
-          <span>Two</span>
-        </Stack>
-      </ApolloThemeProvider>,
+describe("Filter toolbar", () => {
+  it("reports active filter counts", () => {
+    const { getByRole } = render(
+      <ThemeProvider>
+        <FilterToolbar
+          filters={[
+            { label: "Enterprise", value: "enterprise", active: true },
+            { label: "Self-serve", value: "self", active: false },
+          ]}
+        />
+      </ThemeProvider>,
     );
 
-    const stack = getByTestId("stack");
-    expect(stack.dataset.apolloDirection).toBe("row");
-  });
-});
-
-describe("Box", () => {
-  it("applies spacing tokens", () => {
-    const { getByTestId } = render(
-      <ApolloThemeProvider>
-        <Box padding="4" data-testid="box" />
-      </ApolloThemeProvider>,
-    );
-
-    const box = getByTestId("box");
-    expect(box.dataset.apolloPadding).toBe("4");
+    const button = getByRole("button", { name: /filters/i });
+    expect(button.textContent).toContain("1");
   });
 });

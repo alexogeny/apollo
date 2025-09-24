@@ -137,9 +137,11 @@ export const cx = (...classNames: Array<string | false | null | undefined>): str
 
 type VariantsConfig = Record<string, Record<string, StyleObject>>;
 
-type EmptyVariants = Record<never, Record<string, StyleObject>>;
+export type EmptyVariants = Record<never, Record<string, StyleObject>>;
 
 type StyledElementType = React.ElementType;
+
+type Simplify<T> = { [Key in keyof T]: T[Key] } & {};
 
 const resolveElementType = <TTag extends StyledElementType>(
   tag: TTag,
@@ -153,18 +155,36 @@ type VariantSelection<Variants extends VariantsConfig> = {
   [K in keyof Variants]?: keyof Variants[K];
 };
 
-type BaseProps<TTag extends StyledElementType> = React.ComponentPropsWithRef<TTag>;
+type InferComponentProps<TTag extends StyledElementType> = TTag extends React.ForwardRefExoticComponent<
+  infer Props
+>
+  ? Props
+  : TTag extends React.MemoExoticComponent<infer Component>
+  ? InferComponentProps<Component>
+  : TTag extends React.ComponentType<infer Props>
+  ? Props
+  : TTag extends keyof JSX.IntrinsicElements
+  ? JSX.IntrinsicElements[TTag]
+  : never;
+
+type WithoutRef<Props> = Props extends object
+  ? Omit<Props, keyof React.RefAttributes<unknown>>
+  : Props;
+
+type BaseProps<TTag extends StyledElementType> = WithoutRef<InferComponentProps<TTag>>;
 
 export type StyledComponentProps<
   TTag extends StyledElementType,
   Variants extends VariantsConfig,
-> = Omit<BaseProps<TTag>, 'className' | 'style' | 'children'> &
-  VariantSelection<Variants> & {
-    as?: StyledElementType;
-    className?: string | undefined;
-    style?: React.CSSProperties | undefined;
-    children?: React.ReactNode;
-  };
+> = Simplify<
+  Omit<BaseProps<TTag>, 'className' | 'style' | 'children'> &
+    VariantSelection<Variants> & {
+      as?: StyledElementType;
+      className?: string | undefined;
+      style?: React.CSSProperties | undefined;
+      children?: React.ReactNode;
+    }
+>;
 
 interface StyledConfig<
   Variants extends VariantsConfig,
@@ -186,14 +206,15 @@ interface StyledConfig<
 export const createStyled = <
   TTag extends StyledElementType,
   Variants extends VariantsConfig = EmptyVariants,
+  AdditionalProps extends Record<string, unknown> = Record<never, never>,
 >(
   tag: TTag,
-  config: StyledConfig<Variants, StyledComponentProps<TTag, Variants>> = {},
+  config: StyledConfig<Variants, StyledComponentProps<TTag, Variants> & AdditionalProps> = {},
 ): React.ForwardRefExoticComponent<
-  React.PropsWithoutRef<StyledComponentProps<TTag, Variants>> &
+  React.PropsWithoutRef<StyledComponentProps<TTag, Variants> & AdditionalProps> &
     React.RefAttributes<React.ElementRef<TTag>>
 > => {
-  type Props = StyledComponentProps<TTag, Variants>;
+  type Props = StyledComponentProps<TTag, Variants> & AdditionalProps;
   type VariantKey = keyof Variants;
   type VariantValueMap = VariantSelection<Variants>;
 

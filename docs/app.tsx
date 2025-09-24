@@ -1,6 +1,16 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-import { Accordion, Dialog, Popover, Tabs, Toast, Tooltip } from '../packages/apollo/src/molecules';
+import {
+  Accordion,
+  ContextMenu,
+  Dialog,
+  DropdownMenu,
+  HoverCard,
+  Popover,
+  Tabs,
+  Toast,
+  Tooltip,
+} from '../packages/apollo/src/molecules';
 import { APOLLO_THEME_CSS } from '../packages/apollo/src/foundations/theme';
 import {
   motionTokens,
@@ -433,6 +443,42 @@ pre code {
   color: var(--apollo-color-accent);
   font-weight: var(--apollo-typography-weight-medium);
 }
+.demo-hover-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--apollo-space-2);
+  padding: calc(var(--apollo-space-2) + 1px) calc(var(--apollo-space-3) + 3px);
+  border-radius: var(--apollo-radius-pill);
+  background: color-mix(in srgb, var(--apollo-color-accent-subtle) 65%, transparent);
+  color: var(--apollo-color-accent-strong);
+  font-weight: var(--apollo-typography-weight-medium);
+  cursor: pointer;
+}
+.demo-hovercard {
+  display: grid;
+  gap: var(--apollo-space-3);
+}
+.demo-hovercard-header {
+  display: flex;
+  align-items: center;
+  gap: var(--apollo-space-3);
+}
+.demo-hovercard-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--apollo-radius-pill);
+  background: color-mix(in srgb, var(--apollo-color-accent-subtle) 70%, transparent);
+  color: var(--apollo-color-accent);
+  font-weight: var(--apollo-typography-weight-semibold);
+  letter-spacing: 0.04em;
+}
+.demo-hovercard-meta {
+  display: grid;
+  gap: 0.15rem;
+}
 .demo-chip-row {
   display: inline-flex;
   align-items: center;
@@ -496,6 +542,20 @@ pre code {
 }
 .component-preview [data-component='toast-root'] .demo-button--outline {
   border: 1px solid color-mix(in srgb, var(--apollo-toast-fg) 35%, transparent);
+}
+.demo-context-target {
+  padding: calc(var(--apollo-space-4));
+  border-radius: var(--apollo-radius-lg);
+  border: 1px dashed color-mix(in srgb, var(--apollo-color-border) 70%, transparent);
+  background: color-mix(in srgb, var(--apollo-color-bg-subtle) 65%, transparent);
+  cursor: context-menu;
+  transition:
+    border-color var(--apollo-motion-duration-fast) var(--apollo-motion-easing-standard),
+    box-shadow var(--apollo-motion-duration-fast) var(--apollo-motion-easing-standard);
+}
+.demo-context-target:hover {
+  border-color: color-mix(in srgb, var(--apollo-color-accent) 40%, transparent);
+  box-shadow: var(--apollo-shadow-low);
 }
 .footer {
   padding: 2.5rem 1.5rem 3.5rem;
@@ -761,6 +821,51 @@ const popoverCode = `import { Popover } from '@apollo/core';
   </Popover.Portal>
 </Popover.Root>;`;
 
+const hoverCardCode = `import { HoverCard } from '@apollo/core';
+
+<HoverCard.Root>
+  <HoverCard.Trigger>Orchard lead</HoverCard.Trigger>
+  <HoverCard.Portal>
+    <HoverCard.Content side="right" align="center">
+      <div>
+        <strong>Camille Rivera</strong>
+        <p>Guides seasonal blends and tasting tours.</p>
+      </div>
+      <HoverCard.Arrow />
+    </HoverCard.Content>
+  </HoverCard.Portal>
+</HoverCard.Root>;`;
+
+const dropdownMenuCode = `import { DropdownMenu } from '@apollo/core';
+
+<DropdownMenu.Root>
+  <DropdownMenu.Trigger>Share canvas</DropdownMenu.Trigger>
+  <DropdownMenu.Portal>
+    <DropdownMenu.Content sideOffset={8}>
+      <DropdownMenu.Label>Workspace</DropdownMenu.Label>
+      <DropdownMenu.Item>Invite teammate</DropdownMenu.Item>
+      <DropdownMenu.Item>Share link</DropdownMenu.Item>
+      <DropdownMenu.Separator />
+      <DropdownMenu.CheckboxItem checked>Notify crew</DropdownMenu.CheckboxItem>
+      <DropdownMenu.Sub>
+        <DropdownMenu.SubTrigger>Palette</DropdownMenu.SubTrigger>
+        <DropdownMenu.SubContent sideOffset={8} alignOffset={-4}>
+          <DropdownMenu.RadioGroup value="papaya">
+            <DropdownMenu.RadioItem value="papaya">Papaya</DropdownMenu.RadioItem>
+            <DropdownMenu.RadioItem value="plum">Plum</DropdownMenu.RadioItem>
+            <DropdownMenu.RadioItem value="lime">Lime</DropdownMenu.RadioItem>
+          </DropdownMenu.RadioGroup>
+        </DropdownMenu.SubContent>
+      </DropdownMenu.Sub>
+      <DropdownMenu.Separator />
+      <DropdownMenu.Item>
+        Settings
+        <DropdownMenu.Shortcut>⌘,</DropdownMenu.Shortcut>
+      </DropdownMenu.Item>
+    </DropdownMenu.Content>
+  </DropdownMenu.Portal>
+</DropdownMenu.Root>;`;
+
 const tabsCode = `import { Tabs } from '@apollo/core';
 
 <Tabs.Root defaultValue="tastings">
@@ -814,6 +919,26 @@ const toastCode = `import { Toast } from '@apollo/core';
   </Toast.Root>
   <Toast.Viewport />
 </Toast.Provider>;`;
+
+const contextMenuCode = `import { ContextMenu } from '@apollo/core';
+
+<ContextMenu.Root>
+  <ContextMenu.Trigger asChild>
+    <div className="note">Right-click to assign</div>
+  </ContextMenu.Trigger>
+  <ContextMenu.Portal>
+    <ContextMenu.Content>
+      <ContextMenu.Label>Assign label</ContextMenu.Label>
+      <ContextMenu.RadioGroup value="priority">
+        <ContextMenu.RadioItem value="priority">Priority</ContextMenu.RadioItem>
+        <ContextMenu.RadioItem value="follow-up">Follow up</ContextMenu.RadioItem>
+        <ContextMenu.RadioItem value="archive">Archive</ContextMenu.RadioItem>
+      </ContextMenu.RadioGroup>
+      <ContextMenu.Separator />
+      <ContextMenu.Item>Archive note</ContextMenu.Item>
+    </ContextMenu.Content>
+  </ContextMenu.Portal>
+</ContextMenu.Root>;`;
 
 const DialogExample = (): JSX.Element => (
   <Dialog.Root open>
@@ -895,6 +1020,63 @@ const PopoverExample = (): JSX.Element => (
   </Popover.Root>
 );
 
+const HoverCardExample = (): JSX.Element => (
+  <HoverCard.Root openDelay={0} closeDelay={100}>
+    <HoverCard.Trigger className="demo-hover-trigger">Camille Rivera</HoverCard.Trigger>
+    <HoverCard.Portal>
+      <HoverCard.Content sideOffset={16} align="start">
+        <div className="demo-hovercard">
+          <div className="demo-hovercard-header">
+            <span className="demo-hovercard-avatar" aria-hidden="true">
+              CR
+            </span>
+            <div className="demo-hovercard-meta">
+              <span className="demo-heading">Camille Rivera</span>
+              <span className="demo-helper">Orchard lead · Plum palette</span>
+            </div>
+          </div>
+          <p className="demo-helper">
+            Coordinates harvest tastings and curates seasonal blending feedback with growers.
+          </p>
+        </div>
+        <HoverCard.Arrow />
+      </HoverCard.Content>
+    </HoverCard.Portal>
+  </HoverCard.Root>
+);
+
+const DropdownMenuExample = (): JSX.Element => (
+  <DropdownMenu.Root>
+    <DropdownMenu.Trigger asChild>
+      <DemoButton variant="outline">Share canvas</DemoButton>
+    </DropdownMenu.Trigger>
+    <DropdownMenu.Portal>
+      <DropdownMenu.Content sideOffset={8} align="start">
+        <DropdownMenu.Label>Workspace</DropdownMenu.Label>
+        <DropdownMenu.Item>Invite teammate</DropdownMenu.Item>
+        <DropdownMenu.Item>Copy link</DropdownMenu.Item>
+        <DropdownMenu.Separator />
+        <DropdownMenu.CheckboxItem checked>Notify crew</DropdownMenu.CheckboxItem>
+        <DropdownMenu.Sub>
+          <DropdownMenu.SubTrigger>Palette</DropdownMenu.SubTrigger>
+          <DropdownMenu.SubContent sideOffset={8} alignOffset={-4}>
+            <DropdownMenu.RadioGroup value="papaya">
+              <DropdownMenu.RadioItem value="papaya">Papaya</DropdownMenu.RadioItem>
+              <DropdownMenu.RadioItem value="plum">Plum</DropdownMenu.RadioItem>
+              <DropdownMenu.RadioItem value="lime">Lime</DropdownMenu.RadioItem>
+            </DropdownMenu.RadioGroup>
+          </DropdownMenu.SubContent>
+        </DropdownMenu.Sub>
+        <DropdownMenu.Separator />
+        <DropdownMenu.Item>
+          Settings
+          <DropdownMenu.Shortcut>⌘,</DropdownMenu.Shortcut>
+        </DropdownMenu.Item>
+      </DropdownMenu.Content>
+    </DropdownMenu.Portal>
+  </DropdownMenu.Root>
+);
+
 const TabsExample = (): JSX.Element => (
   <Tabs.Root defaultValue="tastings">
     <Tabs.List>
@@ -951,6 +1133,29 @@ const ToastExample = (): JSX.Element => (
   </Toast.Provider>
 );
 
+const ContextMenuExample = (): JSX.Element => (
+  <ContextMenu.Root>
+    <ContextMenu.Trigger asChild>
+      <div className="demo-context-target">
+        <h4 className="demo-heading">Field note</h4>
+        <p className="demo-helper">Right-click to label this observation for follow-up.</p>
+      </div>
+    </ContextMenu.Trigger>
+    <ContextMenu.Portal>
+      <ContextMenu.Content>
+        <ContextMenu.Label>Assign label</ContextMenu.Label>
+        <ContextMenu.RadioGroup value="follow-up">
+          <ContextMenu.RadioItem value="priority">Priority</ContextMenu.RadioItem>
+          <ContextMenu.RadioItem value="follow-up">Follow up</ContextMenu.RadioItem>
+          <ContextMenu.RadioItem value="archive">Archive</ContextMenu.RadioItem>
+        </ContextMenu.RadioGroup>
+        <ContextMenu.Separator />
+        <ContextMenu.Item>Archive note</ContextMenu.Item>
+      </ContextMenu.Content>
+    </ContextMenu.Portal>
+  </ContextMenu.Root>
+);
+
 const MOLECULE_DOCS: MoleculeDoc[] = [
   {
     id: 'dialog',
@@ -982,6 +1187,26 @@ const MOLECULE_DOCS: MoleculeDoc[] = [
     stage: { align: 'start' },
   },
   {
+    id: 'hover-card',
+    name: 'Hover Card',
+    tagline: 'Preview people and entities without commitment.',
+    blurb:
+      'Hover cards gently introduce richer context on hover, ideal for showing teammate bios, orchard stats, or quick entity summaries.',
+    preview: <HoverCardExample />,
+    code: hoverCardCode,
+    stage: { align: 'start' },
+  },
+  {
+    id: 'dropdown-menu',
+    name: 'Dropdown Menu',
+    tagline: 'Compact menus for clustered actions.',
+    blurb:
+      'Dropdown menus keep primary actions close to their trigger, support submenus, and celebrate shortcuts without overwhelming the interface.',
+    preview: <DropdownMenuExample />,
+    code: dropdownMenuCode,
+    stage: { align: 'start' },
+  },
+  {
     id: 'tabs',
     name: 'Tabs',
     tagline: 'Organize peer content in a single viewport.',
@@ -1009,6 +1234,16 @@ const MOLECULE_DOCS: MoleculeDoc[] = [
       'Toasts pop into view with tone-aware accents, offering optional actions while honoring swipe gestures and reduced motion.',
     preview: <ToastExample />,
     code: toastCode,
+    stage: { align: 'start' },
+  },
+  {
+    id: 'context-menu',
+    name: 'Context Menu',
+    tagline: 'Right-click affordances for spatial canvases.',
+    blurb:
+      'Context menus unlock secondary actions where space is at a premium—perfect for boards, annotations, and data-rich grids.',
+    preview: <ContextMenuExample />,
+    code: contextMenuCode,
     stage: { align: 'start' },
   },
 ];

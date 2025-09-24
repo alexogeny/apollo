@@ -1,8 +1,18 @@
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 
 import { createStyled } from '../styled';
+import type { EmptyVariants } from '../styled';
 
-const AccordionRoot = createStyled(AccordionPrimitive.Root, {
+type AccordionRootPrimitive = typeof AccordionPrimitive.Root;
+type AccordionRootAdditionalProps = {
+  collapsible?: boolean;
+};
+
+const AccordionRoot = createStyled<
+  AccordionRootPrimitive,
+  EmptyVariants,
+  AccordionRootAdditionalProps
+>(AccordionPrimitive.Root, {
   base: {
     display: 'grid',
     gap: 'var(--apollo-space-3)',

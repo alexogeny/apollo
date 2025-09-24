@@ -503,6 +503,8 @@ const MOLECULE_NAV_SCRIPT = `
   const panels = Array.from(document.querySelectorAll('[data-molecule-panel]'));
   if (!triggers.length || !panels.length) return;
 
+  const defaultId = triggers[0]?.dataset.moleculeTrigger;
+
   const activate = (id, focusTarget) => {
     triggers.forEach((trigger) => {
       const isActive = trigger.dataset.moleculeTrigger === id;
@@ -519,11 +521,48 @@ const MOLECULE_NAV_SCRIPT = `
     });
   };
 
+  const getHashTarget = () => {
+    const hash = window.location.hash;
+    if (!hash.startsWith('#molecule-')) {
+      return null;
+    }
+    return hash.slice('#molecule-'.length);
+  };
+
+  const syncFromHash = (shouldFocus = false) => {
+    const target = getHashTarget();
+    if (!target) {
+      return false;
+    }
+    const exists = triggers.some((trigger) => trigger.dataset.moleculeTrigger === target);
+    if (!exists) {
+      return false;
+    }
+    activate(target, shouldFocus);
+    return true;
+  };
+
+  if (!syncFromHash()) {
+    if (defaultId) {
+      activate(defaultId, false);
+    }
+  }
+
+  window.addEventListener('hashchange', () => {
+    if (!syncFromHash(true) && defaultId) {
+      activate(defaultId, false);
+    }
+  });
+
   triggers.forEach((trigger) => {
     trigger.addEventListener('click', () => {
       const id = trigger.dataset.moleculeTrigger;
       if (id) {
         activate(id, false);
+        const hash = '#molecule-' + id;
+        if (window.location.hash !== hash) {
+          window.history.replaceState(null, '', hash);
+        }
       }
     });
 
@@ -550,6 +589,10 @@ const MOLECULE_NAV_SCRIPT = `
       const id = target?.dataset.moleculeTrigger;
       if (target && id) {
         activate(id, true);
+        const hash = '#molecule-' + id;
+        if (window.location.hash !== hash) {
+          window.history.replaceState(null, '', hash);
+        }
       }
     });
   });
@@ -1223,7 +1266,7 @@ const MoleculeShowcase = ({ items }: { readonly items: MoleculeDoc[] }): JSX.Ele
           className="component-tab"
           role="tab"
           data-molecule-trigger={item.id}
-          aria-controls={`${item.id}-panel`}
+          aria-controls={`molecule-${item.id}`}
           aria-selected={index === 0 ? 'true' : 'false'}
           tabIndex={index === 0 ? 0 : -1}
         >
@@ -1236,7 +1279,7 @@ const MoleculeShowcase = ({ items }: { readonly items: MoleculeDoc[] }): JSX.Ele
       {items.map((item, index) => (
         <article
           key={item.id}
-          id={`${item.id}-panel`}
+          id={`molecule-${item.id}`}
           className="component-panel"
           role="tabpanel"
           aria-labelledby={`${item.id}-trigger`}
@@ -1322,149 +1365,176 @@ export const App = ({ basePath }: AppProps): JSX.Element => {
         />
       </head>
       <body>
-        <Dashboard.Root>
-          <Topbar.Root>
-            <Topbar.Section>
-              <Topbar.Badge>FruitUI</Topbar.Badge>
-              <div style={{ display: 'grid', gap: '0.25rem' }}>
-                <Topbar.Title>Apollo design system</Topbar.Title>
-                <Topbar.Subtitle>Foundations & molecules</Topbar.Subtitle>
-              </div>
-            </Topbar.Section>
-            <Topbar.Section align="end">
-              <Topbar.Badge tone="neutral">
-                Base path <code>{basePath}</code>
-              </Topbar.Badge>
-            </Topbar.Section>
-          </Topbar.Root>
-          <Dashboard.Main as="main">
-            <Dashboard.Sidebar>
-              <Sidebar.Root aria-label="Documentation navigation">
-                <Sidebar.Section>
-                  <Sidebar.SectionLabel>Sections</Sidebar.SectionLabel>
-                  <Sidebar.List>
-                    {DOC_NAV_ITEMS.map((item, index) => (
-                      <Sidebar.Item
-                        key={item.id}
-                        as="a"
-                        href={`#${item.id}`}
-                        active={index === 0}
-                        aria-current={index === 0 ? 'page' : undefined}
-                      >
-                        <Sidebar.ItemLabel>{item.label}</Sidebar.ItemLabel>
-                        <Sidebar.ItemDescription>{item.description}</Sidebar.ItemDescription>
-                      </Sidebar.Item>
-                    ))}
-                  </Sidebar.List>
-                </Sidebar.Section>
-                <Sidebar.Footer>
-                  FruitUI tokens meet Radix reliability—everything documented inline.
-                </Sidebar.Footer>
-              </Sidebar.Root>
-            </Dashboard.Sidebar>
-            <Dashboard.Content>
-              <Page.Content>
-                <Page.Section id="overview" variant="hero">
-                  <Page.Eyebrow>Design system</Page.Eyebrow>
-                  <Page.Heading>Design foundations & molecules</Page.Heading>
-                  <Page.Lead>
-                    Fruit-forward palettes, neutral surfaces, and tactile motion built on Radix
-                    primitives with custom styling.
-                  </Page.Lead>
-                  <Page.Lead>
-                    Use the sidebar to browse live molecule previews and token scales. Served from{' '}
-                    <code>{basePath}</code>.
-                  </Page.Lead>
-                </Page.Section>
+        <Sidebar.Provider>
+          <Dashboard.Root>
+            <Topbar.Root>
+              <Topbar.Section>
+                <Topbar.Badge>FruitUI</Topbar.Badge>
+                <div style={{ display: 'grid', gap: '0.25rem' }}>
+                  <Topbar.Title>Apollo design system</Topbar.Title>
+                  <Topbar.Subtitle>Foundations & molecules</Topbar.Subtitle>
+                </div>
+              </Topbar.Section>
+              <Topbar.Section align="end">
+                <Topbar.Actions>
+                  <Sidebar.Trigger aria-label="Toggle navigation" />
+                  <Topbar.Badge tone="neutral">
+                    Base path <code>{basePath}</code>
+                  </Topbar.Badge>
+                </Topbar.Actions>
+              </Topbar.Section>
+            </Topbar.Root>
+            <Dashboard.Main as="main">
+              <Dashboard.Sidebar>
+                <Sidebar.Root aria-label="Documentation navigation">
+                  <Sidebar.Section>
+                    <Sidebar.SectionLabel>System sections</Sidebar.SectionLabel>
+                    <Sidebar.List>
+                      {DOC_NAV_ITEMS.map((item, index) => (
+                        <Sidebar.Item
+                          key={item.id}
+                          as="a"
+                          href={`#${item.id}`}
+                          active={index === 0}
+                          aria-current={index === 0 ? 'page' : undefined}
+                        >
+                          <Sidebar.ItemLabel>{item.label}</Sidebar.ItemLabel>
+                          <Sidebar.ItemDescription>{item.description}</Sidebar.ItemDescription>
+                        </Sidebar.Item>
+                      ))}
+                    </Sidebar.List>
+                  </Sidebar.Section>
+                  <Sidebar.Section>
+                    <Sidebar.SectionLabel>Molecule patterns</Sidebar.SectionLabel>
+                    <Sidebar.List>
+                      {MOLECULE_DOCS.map((item) => (
+                        <Sidebar.Item key={item.id} as="a" href={`#molecule-${item.id}`}>
+                          <Sidebar.ItemLabel>{item.name}</Sidebar.ItemLabel>
+                          <Sidebar.ItemDescription>{item.tagline}</Sidebar.ItemDescription>
+                        </Sidebar.Item>
+                      ))}
+                    </Sidebar.List>
+                  </Sidebar.Section>
+                  <Sidebar.Footer>
+                    FruitUI tokens meet Radix reliability—browse patterns and tokens without losing
+                    your place.
+                  </Sidebar.Footer>
+                </Sidebar.Root>
+              </Dashboard.Sidebar>
+              <Dashboard.Content>
+                <Page.Content>
+                  <Page.Section id="overview" variant="hero">
+                    <Page.Eyebrow>Design system</Page.Eyebrow>
+                    <Page.Heading>Design foundations & molecules</Page.Heading>
+                    <Page.Lead>
+                      Fruit-forward palettes, neutral surfaces, and tactile motion built on Radix
+                      primitives with custom styling.
+                    </Page.Lead>
+                    <Page.Lead>
+                      Use the sidebar to browse live molecule previews and token scales. Served from{' '}
+                      <code>{basePath}</code>.
+                    </Page.Lead>
+                  </Page.Section>
 
-                <Section
-                  id="molecules"
-                  title="Molecule library"
-                  description="Dialogs, popovers, tabs, accordions, tooltips, and toasts wrapped with FruitUI styling. Browse with the inline nav to see each pattern in context."
-                >
-                  <MoleculeShowcase items={MOLECULE_DOCS} />
-                </Section>
+                  <Section
+                    id="molecules"
+                    title="Molecule library"
+                    description="Dialogs, popovers, tabs, accordions, tooltips, and toasts wrapped with FruitUI styling. Browse with the inline nav to see each pattern in context."
+                  >
+                    <MoleculeShowcase items={MOLECULE_DOCS} />
+                  </Section>
 
-                <Section
-                  id="palettes"
-                  title="Fruit palettes"
-                  description="Accent ramps tuned for each signature fruit. Values map to variables such as --apollo-accent-500 and inform interactive states."
-                >
-                  <div className="palette-grid">
-                    {objectEntries(palettes).map(([name, definition]) => (
-                      <article key={String(name)} className="palette-card">
-                        <h3>{toTitleCase(String(name))}</h3>
-                        <ul className="swatch-list">
-                          {objectEntries(definition.accent).map(([step, hex]) => (
-                            <ColorSwatch key={String(step)} label={String(step)} value={hex} />
-                          ))}
-                        </ul>
-                      </article>
-                    ))}
-                  </div>
-                </Section>
+                  <Section
+                    id="palettes"
+                    title="Fruit palettes"
+                    description="Accent ramps tuned for each signature fruit. Values map to variables such as --apollo-accent-500 and inform interactive states."
+                  >
+                    <div className="palette-grid">
+                      {objectEntries(palettes).map(([name, definition]) => (
+                        <article key={String(name)} className="palette-card">
+                          <h3>{toTitleCase(String(name))}</h3>
+                          <ul className="swatch-list">
+                            {objectEntries(definition.accent).map(([step, hex]) => (
+                              <ColorSwatch key={String(step)} label={String(step)} value={hex} />
+                            ))}
+                          </ul>
+                        </article>
+                      ))}
+                    </div>
+                  </Section>
 
-                <Section
-                  id="neutrals-status"
-                  title="Neutrals & statuses"
-                  description="Surface pairings for light and dark themes plus semantic feedback colors for success, warning, and danger flows."
-                >
-                  <div className="palette-grid">
-                    {objectEntries(neutralTokens).map(([mode, ramp]) => (
-                      <article key={String(mode)} className="palette-card">
-                        <h3>{`Neutrals · ${toTitleCase(String(mode))}`}</h3>
-                        <ul className="swatch-list">
-                          {objectEntries(ramp).map(([token, value]) => (
-                            <ColorSwatch key={String(token)} label={String(token)} value={value} />
-                          ))}
-                        </ul>
-                      </article>
-                    ))}
-                    {objectEntries(statusTokens).map(([mode, ramp]) => (
-                      <article key={`${String(mode)}-status`} className="palette-card">
-                        <h3>{`Statuses · ${toTitleCase(String(mode))}`}</h3>
-                        <ul className="swatch-list">
-                          {objectEntries(ramp).map(([token, value]) => (
-                            <ColorSwatch key={String(token)} label={String(token)} value={value} />
-                          ))}
-                        </ul>
-                      </article>
-                    ))}
-                  </div>
-                </Section>
+                  <Section
+                    id="neutrals-status"
+                    title="Neutrals & statuses"
+                    description="Surface pairings for light and dark themes plus semantic feedback colors for success, warning, and danger flows."
+                  >
+                    <div className="palette-grid">
+                      {objectEntries(neutralTokens).map(([mode, ramp]) => (
+                        <article key={String(mode)} className="palette-card">
+                          <h3>{`Neutrals · ${toTitleCase(String(mode))}`}</h3>
+                          <ul className="swatch-list">
+                            {objectEntries(ramp).map(([token, value]) => (
+                              <ColorSwatch
+                                key={String(token)}
+                                label={String(token)}
+                                value={value}
+                              />
+                            ))}
+                          </ul>
+                        </article>
+                      ))}
+                      {objectEntries(statusTokens).map(([mode, ramp]) => (
+                        <article key={`${String(mode)}-status`} className="palette-card">
+                          <h3>{`Statuses · ${toTitleCase(String(mode))}`}</h3>
+                          <ul className="swatch-list">
+                            {objectEntries(ramp).map(([token, value]) => (
+                              <ColorSwatch
+                                key={String(token)}
+                                label={String(token)}
+                                value={value}
+                              />
+                            ))}
+                          </ul>
+                        </article>
+                      ))}
+                    </div>
+                  </Section>
 
-                <Section
-                  id="scales"
-                  title="Core scales"
-                  description="Spacing, radius, typography, motion, and elevation scales collapse into semantic CSS variables scoped by theme."
-                >
-                  <div className="foundation-grid">
-                    {foundationGroups.map((group) => (
-                      <article key={group.title} className="foundation-card">
-                        <h3>{group.title}</h3>
-                        <TokenGrid entries={group.entries} />
-                      </article>
-                    ))}
-                  </div>
-                </Section>
+                  <Section
+                    id="scales"
+                    title="Core scales"
+                    description="Spacing, radius, typography, motion, and elevation scales collapse into semantic CSS variables scoped by theme."
+                  >
+                    <div className="foundation-grid">
+                      {foundationGroups.map((group) => (
+                        <article key={group.title} className="foundation-card">
+                          <h3>{group.title}</h3>
+                          <TokenGrid entries={group.entries} />
+                        </article>
+                      ))}
+                    </div>
+                  </Section>
 
-                <Section
-                  id="theme"
-                  title="Applying the theme"
-                  description="Inject the compiled CSS once and drive per-surface configuration via the headless theme helpers."
-                >
-                  <pre>
-                    <code>{themeUsageExample}</code>
-                  </pre>
-                </Section>
-              </Page.Content>
-            </Dashboard.Content>
-          </Dashboard.Main>
-          <Page.Footer>
-            Built with the Apollo foundations · Theme styles baked in via <code>@apollo/core</code>
-          </Page.Footer>
-          <script dangerouslySetInnerHTML={{ __html: MOLECULE_NAV_SCRIPT }} />
-        </Dashboard.Root>
+                  <Section
+                    id="theme"
+                    title="Applying the theme"
+                    description="Inject the compiled CSS once and drive per-surface configuration via the headless theme helpers."
+                  >
+                    <pre>
+                      <code>{themeUsageExample}</code>
+                    </pre>
+                  </Section>
+                </Page.Content>
+              </Dashboard.Content>
+            </Dashboard.Main>
+            <Page.Footer>
+              Built with the Apollo foundations · Theme styles baked in via{' '}
+              <code>@apollo/core</code>
+            </Page.Footer>
+            <script dangerouslySetInnerHTML={{ __html: MOLECULE_NAV_SCRIPT }} />
+          </Dashboard.Root>
+          <Sidebar.Overlay />
+        </Sidebar.Provider>
       </body>
     </html>
   );

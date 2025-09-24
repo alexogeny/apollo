@@ -32,3 +32,4 @@ export {
   type SelectionModifiers,
   type SelectionState,
 } from './selection-engine';
+export { Dashboard } from './dashboard';

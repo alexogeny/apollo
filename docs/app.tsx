@@ -6,10 +6,13 @@ import {
   Dialog,
   DropdownMenu,
   HoverCard,
+  Page,
   Popover,
+  Sidebar,
   Tabs,
   Toast,
   Tooltip,
+  Topbar,
 } from '../packages/apollo/src/molecules';
 import { APOLLO_THEME_CSS } from '../packages/apollo/src/foundations/theme';
 import {
@@ -23,6 +26,7 @@ import {
   typographyTokens,
   zIndexTokens,
 } from '../packages/apollo/src/foundations/tokens';
+import { Dashboard } from '../packages/apollo/src/organisms';
 import { cx } from '../packages/apollo/src/styled';
 
 export const STYLE_PLACEHOLDER = '/*__APOLLO_DYNAMIC_STYLES__*/';
@@ -46,86 +50,46 @@ body {
   background: var(--apollo-color-bg);
   color: var(--apollo-color-text);
 }
-.hero {
-  padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
-  text-align: center;
-  display: grid;
-  gap: 1rem;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--apollo-color-accent) 18%, transparent), transparent);
-  border-bottom: 1px solid var(--apollo-color-border);
+a {
+  color: inherit;
+  text-decoration: none;
 }
-.hero h1 {
-  margin: 0;
-  font-size: clamp(2.25rem, 5vw, 3rem);
-  letter-spacing: -0.02em;
-}
-.hero p {
-  margin: 0 auto;
-  max-width: 60ch;
-  color: var(--apollo-color-text-muted);
-  font-size: 1.05rem;
-}
-.hero .tagline {
-  color: var(--apollo-color-accent-strong);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-}
-.hero .base-hint {
-  display: inline-flex;
-  gap: 0.5rem;
-  align-items: baseline;
-  justify-content: center;
-  margin-top: 0.75rem;
-  font-size: 0.85rem;
-  color: var(--apollo-color-text-muted);
-}
-.hero code {
+code {
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  background: var(--apollo-color-bg-subtle);
-  border: 1px solid var(--apollo-color-border);
+  background: color-mix(in srgb, var(--apollo-color-bg-subtle) 85%, transparent);
   border-radius: var(--apollo-radius-sm);
+  border: 1px solid color-mix(in srgb, var(--apollo-color-border) 65%, transparent);
   padding: 0.2rem 0.45rem;
   color: var(--apollo-color-text);
 }
-main {
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 0 1.5rem 4rem;
-  display: grid;
-  gap: clamp(2rem, 4vw, 3rem);
-}
-section {
-  background: var(--apollo-color-surface);
+pre {
+  margin: 0;
+  background: var(--apollo-color-bg-subtle);
   border-radius: var(--apollo-radius-xl);
-  border: 1px solid var(--apollo-color-border);
-  box-shadow: var(--apollo-shadow-low);
-  padding: clamp(1.5rem, 3vw, 2.5rem);
-  display: grid;
-  gap: 1.75rem;
+  border: 1px solid color-mix(in srgb, var(--apollo-color-border) 55%, transparent);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  overflow-x: auto;
 }
-section h2 {
-  margin: 0;
-  font-size: clamp(1.5rem, 2.2vw, 1.875rem);
-}
-section p {
-  margin: 0;
-  color: var(--apollo-color-text-muted);
-  max-width: 70ch;
+pre code {
+  display: block;
+  font-size: 0.85rem;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--apollo-color-text);
 }
 .palette-grid {
   display: grid;
-  gap: 1rem;
+  gap: var(--apollo-space-3);
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 .palette-card {
-  border: 1px solid var(--apollo-color-border);
-  background: var(--apollo-color-bg-subtle);
+  border: 1px solid color-mix(in srgb, var(--apollo-color-border) 60%, transparent);
+  background: color-mix(in srgb, var(--apollo-color-bg-subtle) 70%, transparent);
   border-radius: var(--apollo-radius-lg);
-  padding: 1rem;
+  padding: var(--apollo-space-4);
   display: grid;
-  gap: 0.75rem;
+  gap: var(--apollo-space-3);
 }
 .palette-card h3 {
   margin: 0;
@@ -138,11 +102,11 @@ section p {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.75rem;
+  gap: var(--apollo-space-3);
 }
 .swatch {
   display: grid;
-  gap: 0.5rem;
+  gap: var(--apollo-space-2);
 }
 .swatch-color {
   height: 48px;
@@ -154,33 +118,30 @@ section p {
   justify-content: space-between;
   align-items: baseline;
   font-size: 0.75rem;
-  color: var(--apollo-color-text-muted);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  color: var(--apollo-color-text-muted);
 }
 .swatch-value {
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  color: var(--apollo-color-text);
-  letter-spacing: normal;
-  text-transform: none;
 }
 .foundation-grid {
   display: grid;
-  gap: 1.5rem;
+  gap: var(--apollo-space-3);
 }
 .foundation-card {
-  border: 1px solid var(--apollo-color-border);
-  background: var(--apollo-color-bg-subtle);
+  border: 1px solid color-mix(in srgb, var(--apollo-color-border) 60%, transparent);
+  background: color-mix(in srgb, var(--apollo-color-bg-subtle) 70%, transparent);
   border-radius: var(--apollo-radius-lg);
-  padding: 1rem;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
   display: grid;
-  gap: 1rem;
+  gap: var(--apollo-space-3);
 }
 .foundation-card h3 {
   margin: 0;
-  font-size: 1rem;
-  letter-spacing: var(--apollo-typography-letter-spacing-tight);
+  font-size: 0.9rem;
   text-transform: uppercase;
+  letter-spacing: var(--apollo-typography-letter-spacing-tight);
   color: var(--apollo-color-text-muted);
 }
 .token-grid {
@@ -188,14 +149,14 @@ section p {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.75rem;
+  gap: var(--apollo-space-2);
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 .token-card {
-  padding: 0.75rem;
+  padding: var(--apollo-space-3);
   border-radius: var(--apollo-radius-md);
   background: var(--apollo-color-surface);
-  border: 1px solid var(--apollo-color-border);
+  border: 1px solid color-mix(in srgb, var(--apollo-color-border) 55%, transparent);
   display: grid;
   gap: 0.35rem;
 }
@@ -207,34 +168,20 @@ section p {
 }
 .token-value {
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  font-size: 0.85rem;
   color: var(--apollo-color-text);
-}
-pre {
-  margin: 0;
-  background: var(--apollo-color-bg-subtle);
-  border-radius: var(--apollo-radius-md);
-  border: 1px solid var(--apollo-color-border);
-  padding: 1rem;
-  overflow-x: auto;
-}
-pre code {
-  display: block;
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   font-size: 0.85rem;
-  color: var(--apollo-color-text);
 }
 .component-shell {
   display: grid;
-  gap: clamp(1.5rem, 4vw, 2.5rem);
-  grid-template-columns: minmax(240px, 280px) 1fr;
+  gap: clamp(var(--apollo-space-5), 4vw, var(--apollo-space-7));
+  grid-template-columns: minmax(200px, 260px) minmax(0, 1fr);
 }
 .component-sidebar {
   display: grid;
   gap: var(--apollo-space-2);
-  position: sticky;
-  top: clamp(6rem, 12vh, 7rem);
   align-content: start;
+  position: sticky;
+  top: calc(var(--apollo-space-9) + 72px);
 }
 .component-tab {
   display: grid;
@@ -242,8 +189,8 @@ pre code {
   padding: calc(var(--apollo-space-3) + 2px);
   border-radius: var(--apollo-radius-lg);
   border: 1px solid color-mix(in srgb, var(--apollo-color-border) 65%, transparent);
-  background: var(--apollo-color-bg-subtle);
-  color: var(--apollo-color-text);
+  background: color-mix(in srgb, var(--apollo-color-bg-subtle) 70%, transparent);
+  color: var(--apollo-color-text-muted);
   text-align: left;
   cursor: pointer;
   font-family: var(--apollo-typography-font-family-base);
@@ -257,12 +204,13 @@ pre code {
 }
 .component-tab:hover {
   border-color: color-mix(in srgb, var(--apollo-color-accent) 30%, transparent);
+  color: var(--apollo-color-text);
 }
 .component-tab[aria-selected='true'] {
   background: var(--apollo-color-accent-subtle);
-  border-color: var(--apollo-color-accent);
+  border-color: color-mix(in srgb, var(--apollo-color-accent) 45%, transparent);
   color: var(--apollo-color-accent-contrast);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--apollo-color-accent) 35%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--apollo-color-accent) 40%, transparent);
 }
 .component-tab:focus-visible {
   outline: none;
@@ -281,10 +229,11 @@ pre code {
 }
 .component-panels {
   display: grid;
+  gap: var(--apollo-space-4);
 }
 .component-panel {
   display: grid;
-  gap: clamp(1.5rem, 4vw, 2.5rem);
+  gap: clamp(var(--apollo-space-5), 4vw, var(--apollo-space-7));
 }
 .component-panel[hidden] {
   display: none;
@@ -292,8 +241,8 @@ pre code {
 .component-preview {
   display: grid;
   gap: var(--apollo-space-4);
-  background: var(--apollo-color-bg-subtle);
-  border: 1px solid color-mix(in srgb, var(--apollo-color-border) 60%, transparent);
+  background: color-mix(in srgb, var(--apollo-color-bg-subtle) 75%, transparent);
+  border: 1px solid color-mix(in srgb, var(--apollo-color-border) 55%, transparent);
   border-radius: var(--apollo-radius-xl);
   padding: clamp(1.25rem, 3vw, 2rem);
 }
@@ -323,46 +272,6 @@ pre code {
 }
 .component-code {
   margin: 0;
-}
-.component-preview [data-component='dialog-overlay'] {
-  position: absolute;
-  inset: 0;
-  background: color-mix(in srgb, var(--apollo-color-backdrop) 65%, transparent);
-  border-radius: var(--apollo-radius-lg);
-  pointer-events: none;
-}
-.component-preview [data-component='dialog-content'] {
-  position: relative;
-  inset: auto;
-  transform: none;
-  width: min(520px, 100%);
-  max-height: none;
-  box-shadow: var(--apollo-shadow-high);
-}
-.component-preview [data-component='popover-content'],
-.component-preview [data-component='tooltip-content'] {
-  position: relative;
-  transform: none;
-  inset: auto;
-  opacity: 1;
-}
-.component-preview [data-component='popover-arrow'],
-.component-preview [data-component='tooltip-arrow'] {
-  display: none;
-}
-.component-preview [data-component='toast-viewport'] {
-  position: relative;
-  bottom: auto;
-  right: auto;
-  width: 100%;
-  gap: var(--apollo-space-3);
-}
-.component-preview [data-component='toast-root'] {
-  transform: none !important;
-  opacity: 1 !important;
-}
-.component-preview [data-component='toast-root']::before {
-  border-radius: 0 999px 999px 0;
 }
 .demo-button {
   display: inline-flex;
@@ -441,18 +350,32 @@ pre code {
   border-radius: var(--apollo-radius-pill);
   background: color-mix(in srgb, var(--apollo-color-accent-subtle) 60%, transparent);
   color: var(--apollo-color-accent);
-  font-weight: var(--apollo-typography-weight-medium);
 }
-.demo-hover-trigger {
+.demo-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--apollo-space-2);
+}
+.demo-chip {
   display: inline-flex;
   align-items: center;
-  gap: var(--apollo-space-2);
-  padding: calc(var(--apollo-space-2) + 1px) calc(var(--apollo-space-3) + 3px);
+  justify-content: center;
+  padding-inline: calc(var(--apollo-space-3) + 1px);
+  padding-block: calc(var(--apollo-space-1) + 2px);
   border-radius: var(--apollo-radius-pill);
-  background: color-mix(in srgb, var(--apollo-color-accent-subtle) 65%, transparent);
-  color: var(--apollo-color-accent-strong);
-  font-weight: var(--apollo-typography-weight-medium);
-  cursor: pointer;
+  background: color-mix(in srgb, var(--apollo-color-bg-subtle) 75%, transparent);
+  color: var(--apollo-color-text);
+  font-size: 0.75rem;
+  letter-spacing: var(--apollo-typography-letter-spacing-tight);
+}
+.demo-heading {
+  margin: 0;
+  font-weight: var(--apollo-typography-weight-semibold);
+  letter-spacing: var(--apollo-typography-letter-spacing-tight);
+}
+.demo-hover-trigger {
+  color: var(--apollo-color-accent);
+  font-weight: var(--apollo-typography-weight-semibold);
 }
 .demo-hovercard {
   display: grid;
@@ -464,64 +387,72 @@ pre code {
   gap: var(--apollo-space-3);
 }
 .demo-hovercard-avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 40px;
   height: 40px;
   border-radius: var(--apollo-radius-pill);
-  background: color-mix(in srgb, var(--apollo-color-accent-subtle) 70%, transparent);
-  color: var(--apollo-color-accent);
+  background: var(--apollo-color-accent);
+  color: var(--apollo-color-accent-contrast);
+  display: grid;
+  place-items: center;
   font-weight: var(--apollo-typography-weight-semibold);
-  letter-spacing: 0.04em;
 }
 .demo-hovercard-meta {
   display: grid;
-  gap: 0.15rem;
+  gap: 0.25rem;
 }
-.demo-chip-row {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--apollo-space-2);
-  flex-wrap: wrap;
+.demo-context-target {
+  padding: var(--apollo-space-4);
+  border-radius: var(--apollo-radius-lg);
+  border: 1px dashed color-mix(in srgb, var(--apollo-color-border) 70%, transparent);
+  background: color-mix(in srgb, var(--apollo-color-bg-subtle) 65%, transparent);
+  cursor: context-menu;
+  transition:
+    border-color var(--apollo-motion-duration-fast) var(--apollo-motion-easing-standard),
+    box-shadow var(--apollo-motion-duration-fast) var(--apollo-motion-easing-standard);
 }
-.demo-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--apollo-space-1);
-  border-radius: var(--apollo-radius-pill);
-  padding: 0.35rem 0.6rem;
-  background: var(--apollo-color-bg-subtle);
-  color: var(--apollo-color-text-muted);
-  font-size: 0.75rem;
-  letter-spacing: 0.02em;
+.demo-context-target:hover {
+  border-color: color-mix(in srgb, var(--apollo-color-accent) 40%, transparent);
+  box-shadow: var(--apollo-shadow-low);
 }
-.demo-heading {
-  margin: 0;
-  font-size: 0.95rem;
-  color: var(--apollo-color-text);
-  font-weight: var(--apollo-typography-weight-semibold);
+.component-preview [data-component='dialog-overlay'] {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--apollo-color-backdrop) 65%, transparent);
+  border-radius: var(--apollo-radius-lg);
+  pointer-events: none;
 }
-.component-preview [data-component='accordion-trigger']::after {
-  margin-left: auto;
+.component-preview [data-component='dialog-content'] {
+  position: relative;
+  inset: auto;
+  transform: none;
+  width: min(520px, 100%);
+  max-height: none;
+  box-shadow: var(--apollo-shadow-high);
 }
-.component-preview [data-component='accordion-content'] {
-  width: 100%;
-}
-.component-preview [data-component='tabs-content'] {
-  background: var(--apollo-color-bg-subtle);
-}
-.component-preview [data-component='tabs-list'] {
-  margin-bottom: var(--apollo-space-3);
-}
-.component-preview [data-component='tabs-trigger'] {
-  min-width: 0;
-}
-.component-preview [data-component='tabs-trigger'][aria-selected='true'] {
-  border-color: color-mix(in srgb, var(--apollo-color-accent) 35%, transparent);
-}
+.component-preview [data-component='popover-content'],
 .component-preview [data-component='tooltip-content'] {
-  pointer-events: auto;
+  position: relative;
+  transform: none;
+  inset: auto;
+  opacity: 1;
+}
+.component-preview [data-component='popover-arrow'],
+.component-preview [data-component='tooltip-arrow'] {
+  display: none;
+}
+.component-preview [data-component='toast-viewport'] {
+  position: relative;
+  bottom: auto;
+  right: auto;
+  width: 100%;
+  gap: var(--apollo-space-3);
+}
+.component-preview [data-component='toast-root'] {
+  transform: none !important;
+  opacity: 1 !important;
+}
+.component-preview [data-component='toast-root']::before {
+  border-radius: 0 999px 999px 0;
 }
 .component-preview [data-component='toast-root'] .demo-button {
   background: transparent;
@@ -543,29 +474,6 @@ pre code {
 .component-preview [data-component='toast-root'] .demo-button--outline {
   border: 1px solid color-mix(in srgb, var(--apollo-toast-fg) 35%, transparent);
 }
-.demo-context-target {
-  padding: calc(var(--apollo-space-4));
-  border-radius: var(--apollo-radius-lg);
-  border: 1px dashed color-mix(in srgb, var(--apollo-color-border) 70%, transparent);
-  background: color-mix(in srgb, var(--apollo-color-bg-subtle) 65%, transparent);
-  cursor: context-menu;
-  transition:
-    border-color var(--apollo-motion-duration-fast) var(--apollo-motion-easing-standard),
-    box-shadow var(--apollo-motion-duration-fast) var(--apollo-motion-easing-standard);
-}
-.demo-context-target:hover {
-  border-color: color-mix(in srgb, var(--apollo-color-accent) 40%, transparent);
-  box-shadow: var(--apollo-shadow-low);
-}
-.footer {
-  padding: 2.5rem 1.5rem 3.5rem;
-  text-align: center;
-  color: var(--apollo-color-text-muted);
-  font-size: 0.875rem;
-}
-.footer a {
-  color: inherit;
-}
 @media (max-width: 960px) {
   .component-shell {
     grid-template-columns: 1fr;
@@ -578,12 +486,11 @@ pre code {
   }
 }
 @media (max-width: 640px) {
-  section {
-    padding: 1.25rem;
+  .palette-grid {
+    grid-template-columns: 1fr;
   }
-  .hero {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+  .foundation-grid {
+    grid-template-columns: 1fr;
   }
 }
 `;
@@ -663,8 +570,10 @@ interface TokenEntry {
 }
 
 interface SectionProps {
+  readonly id?: string;
   readonly title: string;
   readonly description?: string;
+  readonly variant?: 'surface' | 'plain';
   readonly children: ReactNode;
 }
 
@@ -696,8 +605,7 @@ interface MoleculeDoc {
 const objectEntries = <T extends Record<string, unknown>>(value: T) =>
   Object.entries(value) as Array<[keyof T, T[keyof T]]>;
 
-const toTitleCase = (value: string): string =>
-  value.charAt(0).toUpperCase() + value.slice(1);
+const toTitleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 
 const toTokenKey = (value: string): string =>
   value.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
@@ -725,14 +633,20 @@ const flattenTokenTree = (
   return output;
 };
 
-const Section = ({ title, description, children }: SectionProps): JSX.Element => (
-  <section>
-    <div>
-      <h2>{title}</h2>
-      {description ? <p>{description}</p> : null}
-    </div>
+const Section = ({
+  id,
+  title,
+  description,
+  variant = 'surface',
+  children,
+}: SectionProps): JSX.Element => (
+  <Page.Section id={id} variant={variant}>
+    <Page.SectionHeader>
+      <Page.SectionTitle>{title}</Page.SectionTitle>
+      {description ? <Page.SectionDescription>{description}</Page.SectionDescription> : null}
+    </Page.SectionHeader>
     {children}
-  </section>
+  </Page.Section>
 );
 
 const ColorSwatch = ({ label, value }: ColorSwatchProps): JSX.Element => (
@@ -760,7 +674,12 @@ interface DemoButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   readonly variant?: 'solid' | 'outline' | 'ghost';
 }
 
-const DemoButton = ({ variant = 'solid', className, type, ...props }: DemoButtonProps): JSX.Element => (
+const DemoButton = ({
+  variant = 'solid',
+  className,
+  type,
+  ...props
+}: DemoButtonProps): JSX.Element => (
   <button
     {...props}
     type={type ?? 'button'}
@@ -957,7 +876,12 @@ const DialogExample = (): JSX.Element => (
             <label className="demo-label" htmlFor="demo-dialog-date">
               Date
             </label>
-            <input className="demo-input" id="demo-dialog-date" type="date" defaultValue="2024-09-21" />
+            <input
+              className="demo-input"
+              id="demo-dialog-date"
+              type="date"
+              defaultValue="2024-09-21"
+            />
           </div>
           <div className="demo-stack">
             <label className="demo-label" htmlFor="demo-dialog-notes">
@@ -1011,7 +935,9 @@ const PopoverExample = (): JSX.Element => (
             <span className="demo-chip">Tasting</span>
             <span className="demo-chip">Logistics</span>
           </div>
-          <span className="demo-helper">We'll ping whoever is on deck the morning of the visit.</span>
+          <span className="demo-helper">
+            We'll ping whoever is on deck the morning of the visit.
+          </span>
         </div>
         <Popover.Close aria-label="Close popover" />
         <Popover.Arrow />
@@ -1248,6 +1174,39 @@ const MOLECULE_DOCS: MoleculeDoc[] = [
   },
 ];
 
+const DOC_NAV_ITEMS = [
+  {
+    id: 'overview',
+    label: 'Overview',
+    description: 'System snapshot and intent for FruitUI.',
+  },
+  {
+    id: 'molecules',
+    label: 'Molecule library',
+    description: 'Radix-driven overlays, menus, and feedback.',
+  },
+  {
+    id: 'palettes',
+    label: 'Fruit palettes',
+    description: 'Accent ramps tuned for each orchard palette.',
+  },
+  {
+    id: 'neutrals-status',
+    label: 'Neutrals & statuses',
+    description: 'Theme-aware surfaces and state colors.',
+  },
+  {
+    id: 'scales',
+    label: 'Core scales',
+    description: 'Spacing, radii, motion, type, and layers.',
+  },
+  {
+    id: 'theme',
+    label: 'Applying the theme',
+    description: 'Inject CSS once and drive themed surfaces.',
+  },
+];
+
 const MoleculeShowcase = ({ items }: { readonly items: MoleculeDoc[] }): JSX.Element => (
   <div className="component-shell">
     <aside
@@ -1356,100 +1315,156 @@ export const App = ({ basePath }: AppProps): JSX.Element => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Apollo UI · System foundations</title>
         <base href={basePath} />
-        <style dangerouslySetInnerHTML={{ __html: `${APOLLO_THEME_CSS}${DOCS_STYLES}${STYLE_PLACEHOLDER}` }} />
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `${APOLLO_THEME_CSS}${DOCS_STYLES}${STYLE_PLACEHOLDER}`,
+          }}
+        />
       </head>
       <body>
-        <header className="hero">
-          <span className="tagline">Apollo UI</span>
-          <h1>Design foundations & molecules</h1>
-          <p>
-            A snapshot of the tokens powering Apollo&apos;s UI system—fruit-forward palettes, neutral surfaces, tactile motion—and
-            the Radix-powered molecules layered on top. Use the sidebar to explore live previews with accompanying code snippets.
-          </p>
-          <span className="base-hint">
-            Served from base path <code>{basePath}</code>
-          </span>
-        </header>
-        <main>
-          <Section
-            title="Molecule library"
-            description="Dialogs, popovers, tabs, accordions, tooltips, and toasts wrapped with FruitUI styling. Browse with the sidebar to see each pattern in context."
-          >
-            <MoleculeShowcase items={MOLECULE_DOCS} />
-          </Section>
-          <Section
-            title="Fruit palettes"
-            description="Accent ramps tuned for each signature fruit. Values map to variables such as --apollo-accent-500 and inform interactive states."
-          >
-            <div className="palette-grid">
-              {objectEntries(palettes).map(([name, definition]) => (
-                <article key={String(name)} className="palette-card">
-                  <h3>{toTitleCase(String(name))}</h3>
-                  <ul className="swatch-list">
-                    {objectEntries(definition.accent).map(([step, hex]) => (
-                      <ColorSwatch key={String(step)} label={String(step)} value={hex} />
+        <Dashboard.Root>
+          <Topbar.Root>
+            <Topbar.Section>
+              <Topbar.Badge>FruitUI</Topbar.Badge>
+              <div style={{ display: 'grid', gap: '0.25rem' }}>
+                <Topbar.Title>Apollo design system</Topbar.Title>
+                <Topbar.Subtitle>Foundations & molecules</Topbar.Subtitle>
+              </div>
+            </Topbar.Section>
+            <Topbar.Section align="end">
+              <Topbar.Badge tone="neutral">
+                Base path <code>{basePath}</code>
+              </Topbar.Badge>
+            </Topbar.Section>
+          </Topbar.Root>
+          <Dashboard.Main as="main">
+            <Dashboard.Sidebar>
+              <Sidebar.Root aria-label="Documentation navigation">
+                <Sidebar.Section>
+                  <Sidebar.SectionLabel>Sections</Sidebar.SectionLabel>
+                  <Sidebar.List>
+                    {DOC_NAV_ITEMS.map((item, index) => (
+                      <Sidebar.Item
+                        key={item.id}
+                        as="a"
+                        href={`#${item.id}`}
+                        active={index === 0}
+                        aria-current={index === 0 ? 'page' : undefined}
+                      >
+                        <Sidebar.ItemLabel>{item.label}</Sidebar.ItemLabel>
+                        <Sidebar.ItemDescription>{item.description}</Sidebar.ItemDescription>
+                      </Sidebar.Item>
                     ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-          </Section>
+                  </Sidebar.List>
+                </Sidebar.Section>
+                <Sidebar.Footer>
+                  FruitUI tokens meet Radix reliability—everything documented inline.
+                </Sidebar.Footer>
+              </Sidebar.Root>
+            </Dashboard.Sidebar>
+            <Dashboard.Content>
+              <Page.Content>
+                <Page.Section id="overview" variant="hero">
+                  <Page.Eyebrow>Design system</Page.Eyebrow>
+                  <Page.Heading>Design foundations & molecules</Page.Heading>
+                  <Page.Lead>
+                    Fruit-forward palettes, neutral surfaces, and tactile motion built on Radix
+                    primitives with custom styling.
+                  </Page.Lead>
+                  <Page.Lead>
+                    Use the sidebar to browse live molecule previews and token scales. Served from{' '}
+                    <code>{basePath}</code>.
+                  </Page.Lead>
+                </Page.Section>
 
-          <Section
-            title="Neutrals & statuses"
-            description="Surface pairings for light and dark themes plus semantic feedback colors for success, warning, and danger flows."
-          >
-            <div className="palette-grid">
-              {objectEntries(neutralTokens).map(([mode, ramp]) => (
-                <article key={String(mode)} className="palette-card">
-                  <h3>{`Neutrals · ${toTitleCase(String(mode))}`}</h3>
-                  <ul className="swatch-list">
-                    {objectEntries(ramp).map(([token, value]) => (
-                      <ColorSwatch key={String(token)} label={String(token)} value={value} />
+                <Section
+                  id="molecules"
+                  title="Molecule library"
+                  description="Dialogs, popovers, tabs, accordions, tooltips, and toasts wrapped with FruitUI styling. Browse with the inline nav to see each pattern in context."
+                >
+                  <MoleculeShowcase items={MOLECULE_DOCS} />
+                </Section>
+
+                <Section
+                  id="palettes"
+                  title="Fruit palettes"
+                  description="Accent ramps tuned for each signature fruit. Values map to variables such as --apollo-accent-500 and inform interactive states."
+                >
+                  <div className="palette-grid">
+                    {objectEntries(palettes).map(([name, definition]) => (
+                      <article key={String(name)} className="palette-card">
+                        <h3>{toTitleCase(String(name))}</h3>
+                        <ul className="swatch-list">
+                          {objectEntries(definition.accent).map(([step, hex]) => (
+                            <ColorSwatch key={String(step)} label={String(step)} value={hex} />
+                          ))}
+                        </ul>
+                      </article>
                     ))}
-                  </ul>
-                </article>
-              ))}
-              {objectEntries(statusTokens).map(([mode, ramp]) => (
-                <article key={`${String(mode)}-status`} className="palette-card">
-                  <h3>{`Statuses · ${toTitleCase(String(mode))}`}</h3>
-                  <ul className="swatch-list">
-                    {objectEntries(ramp).map(([token, value]) => (
-                      <ColorSwatch key={String(token)} label={String(token)} value={value} />
+                  </div>
+                </Section>
+
+                <Section
+                  id="neutrals-status"
+                  title="Neutrals & statuses"
+                  description="Surface pairings for light and dark themes plus semantic feedback colors for success, warning, and danger flows."
+                >
+                  <div className="palette-grid">
+                    {objectEntries(neutralTokens).map(([mode, ramp]) => (
+                      <article key={String(mode)} className="palette-card">
+                        <h3>{`Neutrals · ${toTitleCase(String(mode))}`}</h3>
+                        <ul className="swatch-list">
+                          {objectEntries(ramp).map(([token, value]) => (
+                            <ColorSwatch key={String(token)} label={String(token)} value={value} />
+                          ))}
+                        </ul>
+                      </article>
                     ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-          </Section>
+                    {objectEntries(statusTokens).map(([mode, ramp]) => (
+                      <article key={`${String(mode)}-status`} className="palette-card">
+                        <h3>{`Statuses · ${toTitleCase(String(mode))}`}</h3>
+                        <ul className="swatch-list">
+                          {objectEntries(ramp).map(([token, value]) => (
+                            <ColorSwatch key={String(token)} label={String(token)} value={value} />
+                          ))}
+                        </ul>
+                      </article>
+                    ))}
+                  </div>
+                </Section>
 
-          <Section
-            title="Core scales"
-            description="Spacing, radius, typography, motion, and elevation scales collapse into semantic CSS variables scoped by theme."
-          >
-            <div className="foundation-grid">
-              {foundationGroups.map((group) => (
-                <article key={group.title} className="foundation-card">
-                  <h3>{group.title}</h3>
-                  <TokenGrid entries={group.entries} />
-                </article>
-              ))}
-            </div>
-          </Section>
+                <Section
+                  id="scales"
+                  title="Core scales"
+                  description="Spacing, radius, typography, motion, and elevation scales collapse into semantic CSS variables scoped by theme."
+                >
+                  <div className="foundation-grid">
+                    {foundationGroups.map((group) => (
+                      <article key={group.title} className="foundation-card">
+                        <h3>{group.title}</h3>
+                        <TokenGrid entries={group.entries} />
+                      </article>
+                    ))}
+                  </div>
+                </Section>
 
-          <Section
-            title="Applying the theme"
-            description="Inject the compiled CSS once and drive per-surface configuration via the headless theme helpers."
-          >
-            <pre>
-              <code>{themeUsageExample}</code>
-            </pre>
-          </Section>
-        </main>
-        <footer className="footer">
-          Built with the Apollo foundations &middot; Theme styles baked in via <code>@apollo/core</code>
-        </footer>
-        <script dangerouslySetInnerHTML={{ __html: MOLECULE_NAV_SCRIPT }} />
+                <Section
+                  id="theme"
+                  title="Applying the theme"
+                  description="Inject the compiled CSS once and drive per-surface configuration via the headless theme helpers."
+                >
+                  <pre>
+                    <code>{themeUsageExample}</code>
+                  </pre>
+                </Section>
+              </Page.Content>
+            </Dashboard.Content>
+          </Dashboard.Main>
+          <Page.Footer>
+            Built with the Apollo foundations · Theme styles baked in via <code>@apollo/core</code>
+          </Page.Footer>
+          <script dangerouslySetInnerHTML={{ __html: MOLECULE_NAV_SCRIPT }} />
+        </Dashboard.Root>
       </body>
     </html>
   );
